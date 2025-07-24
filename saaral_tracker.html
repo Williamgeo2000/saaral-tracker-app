@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -46,6 +46,7 @@
         .input-group input[type="text"],
         .input-group input[type="date"],
         .input-group input[type="number"],
+        .input-group input[type="tel"], /* Added styling for tel input */
         .input-group select { /* Added select to styling */
             width: 100%;
             padding: 10px 14px;
@@ -87,6 +88,24 @@
         }
         .delete-button:hover {
             background-color: #dc2626; /* Red-600 */
+        }
+        .send-button { /* New style for SMS/WhatsApp buttons */
+            background-color: #3b82f6; /* Blue-500 */
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .send-button:hover {
+            background-color: #2563eb; /* Blue-600 */
+        }
+        .send-button:disabled {
+            background-color: #9ca3af; /* Gray-400 */
+            cursor: not-allowed;
         }
         table {
             border-collapse: separate; /* For rounded corners on table */
@@ -268,12 +287,18 @@
         <!-- Staff List Tab Content -->
         <div id="staffListTab" class="tab-content hidden">
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Staff Member</h2>
-            <div class="flex flex-col md:flex-row gap-4 items-end mb-8">
-                <div class="input-group flex-grow">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-end mb-8">
+                <div class="input-group">
                     <label for="newStaffName">Staff Name</label>
                     <input type="text" id="newStaffName" placeholder="e.g., Suresh" class="rounded-lg">
                 </div>
-                <button onclick="addStaffMember()" class="action-button md:w-auto w-full">Add Staff</button>
+                <div class="input-group">
+                    <label for="newStaffMobile">Mobile Number</label>
+                    <input type="tel" id="newStaffMobile" placeholder="e.g., 9876543210" class="rounded-lg">
+                </div>
+                <div class="md:col-span-2">
+                    <button onclick="addStaffMember()" class="action-button w-full">Add Staff</button>
+                </div>
             </div>
 
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">All Staff Members</h2>
@@ -282,6 +307,7 @@
                     <thead>
                         <tr>
                             <th class="rounded-tl-lg">Staff Name</th>
+                            <th>Mobile Number</th>
                             <th class="rounded-tr-lg w-24">Actions</th>
                         </tr>
                     </thead>
@@ -444,6 +470,22 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="flex justify-center gap-4 mt-6">
+                    <a id="smsButton" href="#" class="send-button" target="_blank" rel="noopener noreferrer" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path d="M7.749 1.554a.75.75 0 0 0-1.498 0L3.872 6.73c.433.117.882.26 1.33.418.895.319 1.759.724 2.572 1.177l.16.096c.644.384 1.18.857 1.574 1.385.405.54.704 1.139.872 1.787.086.331.157.667.201 1.002a.75.75 0 0 0 1.499-.001 20.328 20.328 0 0 0-.21-1.206c-.161-.59-.405-1.144-.72-1.657-.367-.597-.843-1.134-1.403-1.588l-.16-.096a6.016 6.016 0 0 1-2.078-.975L7.749 1.554ZM10.32 8.79a.75.75 0 0 0-1.223.804c.047.073.1.147.159.22.251.307.545.617.876.924.33.307.69.597 1.07.86l.16.096c.405.242.775.457 1.109.64.32.175.61.32.86.43.209.096.39.16.54.195a.75.75 0 0 0 .285-1.472 4.498 4.498 0 0 0-.79-.176 5.003 5.003 0 0 1-.77-.36 6.016 6.016 0 0 1-1.403-.86l-.16-.096c-.38-.263-.74-.553-1.07-.86-.33-.307-.625-.617-.876-.924-.059-.073-.112-.147-.159-.22Zm-2.79 7.787c-.433-.117-.882-.26-1.33-.418-.895-.319-1.759-.724-2.572-1.177l-.16-.096a6.016 6.016 0 0 1-1.574-1.385c-.405-.54-.704-1.139-.872-1.787a20.328 20.328 0 0 0-.201-1.002.75.75 0 0 0-1.499.001 20.328 20.328 0 0 0 .21 1.206c.161.59.405 1.144.72 1.657.367.597.843 1.134 1.403 1.588l.16.096c.644.384 1.18.857 1.574 1.385.405.54.704 1.139.872 1.787.086.331.157.667.201 1.002a.75.75 0 0 0 1.499-.001 20.328 20.328 0 0 0-.21-1.206c-.161-.59-.405-1.144-.72-1.657-.367-.597-.843-1.134-1.403-1.588l-.16-.096a6.016 6.016 0 0 1-2.078-.975ZM13.68 15.21a.75.75 0 0 0 1.223-.804c-.047-.073-.1-.147-.159-.22-.251-.307-.545-.617-.876-.924-.33-.307-.69-.597-1.07-.86l-.16-.096a6.016 6.016 0 0 1-1.403-.86 5.003 5.003 0 0 1-.77-.36c-.209-.096-.39-.16-.54-.195a.75.75 0 0 0-.285 1.472 4.498 4.498 0 0 0 .79.176c.32.175.61.32.86.43.33.15.69.264 1.109.347l.16.096c.38.263.74.553 1.07.86.33.307.625.617.876.924.059.073.112.147.159.22Z" />
+                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM2.25 12c0 2.789 1.125 5.304 2.933 7.163l1.297-1.297a.75.75 0 0 1 1.06 0c.38.38.38 1.003 0 1.383l-1.44 1.439A9.75 9.75 0 0 0 12 21.75c2.789 0 5.304-1.125 7.163-2.933l-1.297-1.297a.75.75 0 0 1 0-1.06c.38-.38 1.003-.38 1.383 0l1.439 1.44A9.75 9.75 0 0 0 21.75 12c0-2.789-1.125-5.304-2.933-7.163l-1.297 1.297a.75.75 0 0 1-1.06 0c-.38-.38-.38-1.003 0-1.383l1.439-1.44A9.75 9.75 0 0 0 12 2.25c-2.789 0-5.304 1.125-7.163 2.933l1.297 1.297a.75.75 0 0 1 0 1.06c-.38.38-1.003.38 1.383 0l-1.44 1.439A9.75 9.75 0 0 0 2.25 12Z" clip-rule="evenodd" />
+                        </svg>
+                        Send via SMS
+                    </a>
+                    <a id="whatsappButton" href="#" class="send-button" target="_blank" rel="noopener noreferrer" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.067.534 4.02 1.5 5.72l-1.5 4.78 5-1.5c1.693.966 3.646 1.5 5.72 1.5 6.627 0 12-5.373 12-12S18.627 0 12 0zm0 2C17.522 2 22 6.478 22 12c0 5.523-4.478 10-10 10-1.993 0-3.86-.585-5.464-1.6L4 20l1.176-3.764c-1.026-1.604-1.6-3.471-1.6-5.464C3.522 6.478 8 2 12 2zm-2.25 5.5h-.5c-.276 0-.5.224-.5.5v2.5c0 .276.224.5.5.5h.5c.276 0 .5-.224.5-.5v-2.5c0-.276-.224-.5-.5-.5zm4.5 0h-.5c-.276 0-.5.224-.5.5v2.5c0 .276.224.5.5.5h.5c.276 0 .5-.224.5-.5v-2.5c0-.276-.224-.5-.5-.5zM12 11c-2.761 0-5 2.239-5 5s2.239 5 5 5 5-2.239 5-5-2.239-5-5-5zm0 1c2.209 0 4 1.791 4 4s-1.791 4-4 4-4-1.791-4-4 1.791-4 4-4zm-2 2h4v2h-4v-2z"/>
+                        </svg>
+                        Send via WhatsApp
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -487,8 +529,9 @@
         // Data storage for bills and payments
         let billDetails = [];
         let paymentHistory = [];
-        // Global set to keep track of all unique staff names for dropdowns
-        let allStaffNames = new Set();
+        // Global object to store staff details (name and mobile number)
+        // Format: { "StaffName1": { mobile: "1234567890" }, "StaffName2": { mobile: "0987654321" } }
+        let staffDetails = {};
 
         // Variable to store the callback for confirmation dialog
         let confirmationCallback = null;
@@ -525,20 +568,23 @@
         // Function to add a new staff member explicitly
         function addStaffMember() {
             const newStaffNameInput = document.getElementById('newStaffName');
+            const newStaffMobileInput = document.getElementById('newStaffMobile');
             const staffName = newStaffNameInput.value.trim();
+            const mobileNumber = newStaffMobileInput.value.trim();
 
             if (!staffName) {
                 showMessage('Please enter a staff name.');
                 return;
             }
-            if (allStaffNames.has(staffName)) {
+            if (staffDetails[staffName]) { // Check if staff name already exists
                 showMessage(`Staff member "${staffName}" already exists.`);
                 newStaffNameInput.value = ''; // Clear input even if exists
                 return;
             }
 
-            allStaffNames.add(staffName);
+            staffDetails[staffName] = { mobile: mobileNumber }; // Store name and mobile
             newStaffNameInput.value = '';
+            newStaffMobileInput.value = '';
             showMessage(`Staff "${staffName}" added.`);
             renderTables(); // Update all tables and dropdowns
         }
@@ -550,8 +596,8 @@
                 `Are you sure you want to delete staff member "${staffNameToDelete}" and all their associated bills and payments? This action cannot be undone.`,
                 (confirmed) => {
                     if (confirmed) {
-                        // Remove from allStaffNames set
-                        allStaffNames.delete(staffNameToDelete);
+                        // Remove from staffDetails object
+                        delete staffDetails[staffNameToDelete];
 
                         // Filter out bills associated with this staff member
                         billDetails = billDetails.filter(bill => bill.staffName !== staffNameToDelete);
@@ -590,7 +636,10 @@
                 billNo: billNo,
                 billAmount: billAmount
             });
-            allStaffNames.add(staffName); // Add to master staff list if new
+            // If staff was added via bill, ensure they are in staffDetails (with empty mobile if not provided)
+            if (!staffDetails[staffName]) {
+                staffDetails[staffName] = { mobile: '' };
+            }
 
             // Clear form fields
             staffNameSelect.value = ''; // Reset dropdown
@@ -622,7 +671,10 @@
                 paymentDate: paymentDate,
                 amountPaid: amountPaid
             });
-            allStaffNames.add(staffName); // Add to master staff list if new
+            // If staff was added via payment, ensure they are in staffDetails (with empty mobile if not provided)
+            if (!staffDetails[staffName]) {
+                staffDetails[staffName] = { mobile: '' };
+            }
 
             // Clear form fields
             staffNameSelect.value = ''; // Reset dropdown
@@ -686,8 +738,9 @@
             });
 
             // Calculate Total Pending and render rows
-            // Ensure all staff in allStaffNames are considered, even if they have 0 bills/payments
-            const allStaffForSummary = new Set([...allStaffNames, ...Object.keys(staffSummary)]);
+            // Ensure all staff in staffDetails are considered, even if they have 0 bills/payments
+            const allStaffNamesArray = Object.keys(staffDetails);
+            const allStaffForSummary = new Set([...allStaffNamesArray, ...Object.keys(staffSummary)]);
 
             Array.from(allStaffForSummary).sort().forEach(staffName => {
                 const summary = staffSummary[staffName] || { totalBill: 0, totalPaid: 0 }; // Initialize if staff has no transactions
@@ -706,9 +759,10 @@
             const tableBody = document.getElementById('staffListTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = ''; // Clear existing rows
 
-            Array.from(allStaffNames).sort().forEach(staffName => {
+            Array.from(Object.keys(staffDetails)).sort().forEach(staffName => {
                 const row = tableBody.insertRow();
                 row.insertCell().textContent = staffName;
+                row.insertCell().textContent = staffDetails[staffName].mobile || 'N/A'; // Display mobile number
                 const actionsCell = row.insertCell();
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
@@ -722,19 +776,19 @@
         function populateStaffDropdowns() {
             const billStaffSelect = document.getElementById('billStaffNameSelect');
             const paymentStaffSelect = document.getElementById('paymentStaffNameSelect');
-            const reportStaffSelect = document.getElementById('reportStaffNameSelect'); // New report dropdown
+            const reportStaffSelect = document.getElementById('reportStaffNameSelect');
 
             // Store current selected values to restore after repopulating
             const currentBillSelected = billStaffSelect.value;
             const currentPaymentSelected = paymentStaffSelect.value;
-            const currentReportSelected = reportStaffSelect.value; // Store report selection
+            const currentReportSelected = reportStaffSelect.value;
 
             // Clear existing options (except the default "Select Staff")
             billStaffSelect.innerHTML = '<option value="">Select Staff</option>';
             paymentStaffSelect.innerHTML = '<option value="">Select Staff</option>';
-            reportStaffSelect.innerHTML = '<option value="">Select Staff</option>'; // Clear report dropdown
+            reportStaffSelect.innerHTML = '<option value="">Select Staff</option>';
 
-            const sortedStaff = Array.from(allStaffNames).sort();
+            const sortedStaff = Array.from(Object.keys(staffDetails)).sort();
 
             sortedStaff.forEach(name => {
                 const option1 = document.createElement('option');
@@ -747,20 +801,20 @@
                 option2.textContent = name;
                 paymentStaffSelect.appendChild(option2);
 
-                const option3 = document.createElement('option'); // For report dropdown
+                const option3 = document.createElement('option');
                 option3.value = name;
                 option3.textContent = name;
                 reportStaffSelect.appendChild(option3);
             });
 
             // Restore previously selected values if they still exist
-            if (allStaffNames.has(currentBillSelected)) {
+            if (staffDetails[currentBillSelected]) {
                 billStaffSelect.value = currentBillSelected;
             }
-            if (allStaffNames.has(currentPaymentSelected)) {
+            if (staffDetails[currentPaymentSelected]) {
                 paymentStaffSelect.value = currentPaymentSelected;
             }
-            if (allStaffNames.has(currentReportSelected)) { // Restore report selection
+            if (staffDetails[currentReportSelected]) {
                 reportStaffSelect.value = currentReportSelected;
             }
         }
@@ -773,9 +827,14 @@
             const reportPendingAmountBox = document.getElementById('reportPendingAmount');
             const pendingAmountValueSpan = document.getElementById('pendingAmountValue');
 
+            const smsButton = document.getElementById('smsButton');
+            const whatsappButton = document.getElementById('whatsappButton');
+
             reportBillsTableBody.innerHTML = ''; // Clear previous report
             reportPaymentsTableBody.innerHTML = ''; // Clear previous report
             reportPendingAmountBox.classList.add('hidden'); // Hide pending amount box by default
+            smsButton.setAttribute('disabled', 'true'); // Disable buttons by default
+            whatsappButton.setAttribute('disabled', 'true');
 
             if (!selectedStaff) {
                 reportBillsTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500">Select a staff member to view bills.</td></tr>';
@@ -822,6 +881,23 @@
                 });
             } else {
                 reportPaymentsTableBody.innerHTML = `<tr><td colspan="2" class="text-center text-gray-500">No payments found for ${selectedStaff}.</td></tr>`;
+            }
+
+            // Prepare message for SMS/WhatsApp
+            const staffMobile = staffDetails[selectedStaff] ? staffDetails[selectedStaff].mobile : '';
+            if (staffMobile) {
+                const reportMessage = `Saaral Staff Report for ${selectedStaff}:\n` +
+                                      `Total Bill: ₹${totalBillForReport.toFixed(2)}\n` +
+                                      `Total Paid: ₹${totalPaidForReport.toFixed(2)}\n` +
+                                      `Pending Balance: ₹${pendingAmountForReport.toFixed(2)}\n\n` +
+                                      `For full details, please check the Saaral Staff Payment Tracker app.`;
+
+                smsButton.href = `sms:${staffMobile}?body=${encodeURIComponent(reportMessage)}`;
+                whatsappButton.href = `https://wa.me/${staffMobile}?text=${encodeURIComponent(reportMessage)}`;
+                smsButton.removeAttribute('disabled');
+                whatsappButton.removeAttribute('disabled');
+            } else {
+                showMessage(`Mobile number not available for ${selectedStaff}. Cannot send report via SMS/WhatsApp.`);
             }
         }
 
@@ -888,6 +964,11 @@
             document.getElementById('paymentDate').value = today;
 
             // Add some initial sample data
+            // Note: Now staffDetails object holds the mobile number
+            staffDetails['Priya'] = { mobile: '9876543210' };
+            staffDetails['Rahul'] = { mobile: '9988776655' };
+            staffDetails['Amit'] = { mobile: '' }; // Amit has no mobile number initially
+
             billDetails.push(
                 { staffName: 'Priya', billDate: '2025-07-01', billNo: 'D001', billAmount: 1500 },
                 { staffName: 'Rahul', billDate: '2025-07-05', billNo: 'D002', billAmount: 2000 },
@@ -901,13 +982,20 @@
                 { staffName: 'Priya', paymentDate: '2025-07-25', amountPaid: 500 }
             );
 
-            // Populate allStaffNames from initial data
-            billDetails.forEach(bill => allStaffNames.add(bill.staffName));
-            paymentHistory.forEach(payment => allStaffNames.add(payment.staffName));
+            // Ensure staffDetails is populated from any existing bill/payment data
+            billDetails.forEach(bill => {
+                if (!staffDetails[bill.staffName]) {
+                    staffDetails[bill.staffName] = { mobile: '' };
+                }
+            });
+            paymentHistory.forEach(payment => {
+                if (!staffDetails[payment.staffName]) {
+                    staffDetails[payment.staffName] = { mobile: '' };
+                }
+            });
 
             renderTables(); // Render tables with initial data and populate dropdowns
-            // Set initial tab to Bill Details, and ensure the dropdown reflects this
-            showTab('billDetailsTab');
+            showTab('billDetailsTab'); // Show Bill Details tab by default
         };
     </script>
 </body>
