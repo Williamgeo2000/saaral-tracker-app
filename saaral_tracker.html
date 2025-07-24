@@ -1,0 +1,914 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saaral Staff Payment Tracker</title>
+
+    <!-- Apple-specific meta tags for Add to Home Screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Saaral Tracker">
+    <link rel="apple-touch-icon" href="https://placehold.co/180x180/007AFF/FFFFFF?text=SST">
+    <!-- You can replace the href above with a URL to your actual app icon (e.g., a logo) -->
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and rounded corners */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            padding: 30px;
+            width: 100%;
+            max-width: 1200px; /* Max width for larger screens */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        /* No more .tab-button styles as we're using a select dropdown */
+        .input-group label {
+            font-weight: 500;
+            color: #4b5563; /* Gray-700 */
+            margin-bottom: 6px;
+            display: block;
+        }
+        .input-group input[type="text"],
+        .input-group input[type="date"],
+        .input-group input[type="number"],
+        .input-group select { /* Added select to styling */
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db; /* Gray-300 */
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .input-group input:focus,
+        .input-group select:focus { /* Added select focus styling */
+            outline: none;
+            border-color: #3b82f6; /* Blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .action-button {
+            background-color: #10b981; /* Green-500 */
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+        .action-button:hover {
+            background-color: #059669; /* Green-600 */
+            transform: translateY(-1px);
+        }
+        .action-button:active {
+            transform: translateY(0);
+        }
+        .delete-button {
+            background-color: #ef4444; /* Red-500 */
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .delete-button:hover {
+            background-color: #dc2626; /* Red-600 */
+        }
+        table {
+            border-collapse: separate; /* For rounded corners on table */
+            border-spacing: 0;
+            overflow: hidden; /* Ensures rounded corners are visible */
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb; /* Gray-200 */
+        }
+        th {
+            background-color: #f9fafb; /* Lightest gray for header */
+            font-weight: 600;
+            color: #374151; /* Gray-800 */
+            text-transform: uppercase;
+            font-size: 0.875rem; /* Smaller font for headers */
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .table-container {
+            max-height: 400px; /* Fixed height for scrollable tables */
+            overflow-y: auto;
+            border: 1px solid #e5e7eb; /* Border around scrollable area */
+            border-radius: 8px;
+            margin-bottom: 20px; /* Space between tables if multiple */
+        }
+        /* Style for the message box */
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+        }
+        .message-box.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        /* Confirmation dialog styles */
+        .confirmation-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .confirmation-dialog.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .confirmation-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .confirmation-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+        }
+        .confirmation-content p {
+            color: #4b5563;
+            margin-bottom: 25px;
+        }
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .confirmation-buttons button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .confirmation-buttons .confirm-yes {
+            background-color: #ef4444; /* Red-500 */
+            color: white;
+        }
+        .confirmation-buttons .confirm-yes:hover {
+            background-color: #dc2626; /* Red-600 */
+        }
+        .confirmation-buttons .confirm-no {
+            background-color: #e5e7eb; /* Gray-200 */
+            color: #4b5563;
+        }
+        .confirmation-buttons .confirm-no:hover {
+            background-color: #d1d5db; /* Gray-300 */
+        }
+        .report-summary-box {
+            background-color: #e0f2fe; /* Light blue background */
+            border: 1px solid #90cdf4; /* Blue border */
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        .report-summary-box p {
+            font-size: 1.125rem; /* Larger font */
+            font-weight: 600;
+            color: #2563eb; /* Darker blue text */
+        }
+        .report-summary-box span {
+            font-size: 1.5rem; /* Even larger for amount */
+            font-weight: 700;
+            color: #1d4ed8; /* Even darker blue */
+        }
+        .total-summary-box {
+            background-color: #d1fae5; /* Light green background */
+            border: 1px solid #34d399; /* Green border */
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .total-summary-item {
+            flex: 1;
+            min-width: 200px;
+        }
+        .total-summary-item p {
+            font-size: 1.25rem; /* Larger font */
+            font-weight: 600;
+            color: #065f46; /* Darker green text */
+            margin-bottom: 5px;
+        }
+        .total-summary-item span {
+            font-size: 2rem; /* Even larger for amount */
+            font-weight: 700;
+            color: #047857; /* Even darker green */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Saaral Staff Payment Tracker</h1>
+
+        <!-- Tab Navigation Dropdown -->
+        <div class="flex justify-center mb-6">
+            <div class="input-group w-full max-w-xs">
+                <label for="mainTabSelect" class="sr-only">Select Section</label>
+                <select id="mainTabSelect" class="rounded-lg" onchange="showTab(this.value)">
+                    <option value="staffListTab">Staff List</option>
+                    <option value="billDetailsTab" selected>Bill Details</option>
+                    <option value="paymentHistoryTab">Payment History</option>
+                    <option value="summaryTab">Per-Staff Summary</option>
+                    <option value="reportTab">Report</option>
+                    <option value="overallTotalsTab">Overall Totals</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Staff List Tab Content -->
+        <div id="staffListTab" class="tab-content hidden">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Staff Member</h2>
+            <div class="flex flex-col md:flex-row gap-4 items-end mb-8">
+                <div class="input-group flex-grow">
+                    <label for="newStaffName">Staff Name</label>
+                    <input type="text" id="newStaffName" placeholder="e.g., Suresh" class="rounded-lg">
+                </div>
+                <button onclick="addStaffMember()" class="action-button md:w-auto w-full">Add Staff</button>
+            </div>
+
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">All Staff Members</h2>
+            <div class="table-container">
+                <table id="staffListTable" class="min-w-full bg-white rounded-lg shadow-sm">
+                    <thead>
+                        <tr>
+                            <th class="rounded-tl-lg">Staff Name</th>
+                            <th class="rounded-tr-lg w-24">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Staff list will be rendered here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Bill Details Tab Content -->
+        <div id="billDetailsTab" class="tab-content">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Bill</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="input-group">
+                    <label for="billStaffNameSelect">Staff Name</label>
+                    <select id="billStaffNameSelect" class="rounded-lg">
+                        <option value="">Select Staff</option>
+                        <!-- Staff names will be populated here by JavaScript -->
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="billDate">Bill Date</label>
+                    <input type="date" id="billDate" class="rounded-lg">
+                </div>
+                <div class="input-group">
+                    <label for="billNo">Bill No.</labeL>
+                    <input type="text" id="billNo" placeholder="e.g., D001" class="rounded-lg">
+                </div>
+                <div class="input-group">
+                    <label for="billAmount">Bill Amount (₹)</label>
+                    <input type="number" id="billAmount" placeholder="e.g., 1500" class="rounded-lg">
+                </div>
+            </div>
+            <button onclick="addBill()" class="action-button w-full mb-8">Add Bill</button>
+
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">All Bills</h2>
+            <div class="table-container">
+                <table id="billDetailsTable" class="min-w-full bg-white rounded-lg shadow-sm">
+                    <thead>
+                        <tr>
+                            <th class="rounded-tl-lg">Staff Name</th>
+                            <th>Bill Date</th>
+                            <th>Bill No.</th>
+                            <th class="rounded-tr-lg">Bill Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Bill details will be rendered here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Payment History Tab Content -->
+        <div id="paymentHistoryTab" class="tab-content hidden">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Payment</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="input-group">
+                    <label for="paymentStaffNameSelect">Staff Name</label>
+                    <select id="paymentStaffNameSelect" class="rounded-lg">
+                        <option value="">Select Staff</option>
+                        <!-- Staff names will be populated here by JavaScript -->
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="paymentDate">Payment Date</label>
+                    <input type="date" id="paymentDate" class="rounded-lg">
+                </div>
+                <div class="input-group">
+                    <label for="amountPaid">Amount Paid (₹)</label>
+                    <input type="number" id="amountPaid" placeholder="e.g., 1000" class="rounded-lg">
+                </div>
+            </div>
+            <button onclick="addPayment()" class="action-button w-full mb-8">Add Payment</button>
+
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">All Payments</h2>
+            <div class="table-container">
+                <table id="paymentHistoryTable" class="min-w-full bg-white rounded-lg shadow-sm">
+                    <thead>
+                        <tr>
+                            <th class="rounded-tl-lg">Staff Name</th>
+                            <th>Payment Date</th>
+                            <th class="rounded-tr-lg">Amount Paid (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Payment history will be rendered here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Summary Tab Content (Per-Staff Summary) -->
+        <div id="summaryTab" class="tab-content hidden">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Per-Staff Summary</h2>
+            <div class="table-container">
+                <table id="summaryTable" class="min-w-full bg-white rounded-lg shadow-sm">
+                    <thead>
+                        <tr>
+                            <th class="rounded-tl-lg">Staff Name</th>
+                            <th>Total Bill (₹)</th>
+                            <th>Total Paid (₹)</th>
+                            <th class="rounded-tr-lg">Total Pending (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Summary will be rendered here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Report Tab Content -->
+        <div id="reportTab" class="tab-content hidden">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Staff Report</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="input-group">
+                    <label for="reportStaffNameSelect">Select Staff Member</label>
+                    <select id="reportStaffNameSelect" class="rounded-lg" onchange="generateReport()">
+                        <option value="">Select Staff</option>
+                        <!-- Staff names will be populated here by JavaScript -->
+                    </select>
+                </div>
+            </div>
+
+            <div id="reportContent">
+                <!-- Pending amount will be displayed here -->
+                <div id="reportPendingAmount" class="report-summary-box hidden">
+                    <p>Pending Amount: <span id="pendingAmountValue">₹0.00</span></p>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-700 mb-3 mt-6">Bills Taken</h3>
+                <div class="table-container">
+                    <table id="reportBillsTable" class="min-w-full bg-white rounded-lg shadow-sm">
+                        <thead>
+                            <tr>
+                                <th class="rounded-tl-lg">Bill Date</th>
+                                <th>Bill No.</th>
+                                <th class="rounded-tr-lg">Bill Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="3" class="text-center text-gray-500">Select a staff member to view bills.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-xl font-semibold text-gray-700 mb-3 mt-6">Payments Made</h3>
+                <div class="table-container">
+                    <table id="reportPaymentsTable" class="min-w-full bg-white rounded-lg shadow-sm">
+                        <thead>
+                            <tr>
+                                <th class="rounded-tl-lg">Payment Date</th>
+                                <th class="rounded-tr-lg">Amount Paid (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="2" class="text-center text-gray-500">Select a staff member to view payments.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overall Totals Tab Content -->
+        <div id="overallTotalsTab" class="tab-content hidden">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Overall Shop Totals</h2>
+            <div class="total-summary-box">
+                <div class="total-summary-item">
+                    <p>Total Bill Amount</p>
+                    <span id="overallTotalBill">₹0.00</span>
+                </div>
+                <div class="total-summary-item">
+                    <p>Total Payment Received</p>
+                    <span id="overallTotalPayment">₹0.00</span>
+                </div>
+                <div class="total-summary-item">
+                    <p>Overall Pending</p>
+                    <span id="overallTotalPending">₹0.00</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Message Box for notifications -->
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmationDialog" class="confirmation-dialog">
+        <div class="confirmation-content">
+            <h3 id="confirmationTitle">Confirm Deletion</h3>
+            <p id="confirmationMessage">Are you sure you want to delete this item?</p>
+            <div class="confirmation-buttons">
+                <button class="confirm-yes" onclick="handleConfirmation(true)">Yes</button>
+                <button class="confirm-no" onclick="handleConfirmation(false)">No</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage for bills and payments
+        let billDetails = [];
+        let paymentHistory = [];
+        // Global set to keep track of all unique staff names for dropdowns
+        let allStaffNames = new Set();
+
+        // Variable to store the callback for confirmation dialog
+        let confirmationCallback = null;
+
+        // Function to show messages to the user
+        function showMessage(message, duration = 3000) {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, duration);
+        }
+
+        // Function to show a custom confirmation dialog
+        function showConfirmation(title, message, callback) {
+            const dialog = document.getElementById('confirmationDialog');
+            document.getElementById('confirmationTitle').textContent = title;
+            document.getElementById('confirmationMessage').textContent = message;
+            confirmationCallback = callback; // Store the callback function
+            dialog.classList.add('show');
+        }
+
+        // Function to handle confirmation dialog response
+        function handleConfirmation(confirmed) {
+            const dialog = document.getElementById('confirmationDialog');
+            dialog.classList.remove('show');
+            if (confirmationCallback) {
+                confirmationCallback(confirmed);
+                confirmationCallback = null; // Clear the callback
+            }
+        }
+
+        // Function to add a new staff member explicitly
+        function addStaffMember() {
+            const newStaffNameInput = document.getElementById('newStaffName');
+            const staffName = newStaffNameInput.value.trim();
+
+            if (!staffName) {
+                showMessage('Please enter a staff name.');
+                return;
+            }
+            if (allStaffNames.has(staffName)) {
+                showMessage(`Staff member "${staffName}" already exists.`);
+                newStaffNameInput.value = ''; // Clear input even if exists
+                return;
+            }
+
+            allStaffNames.add(staffName);
+            newStaffNameInput.value = '';
+            showMessage(`Staff "${staffName}" added.`);
+            renderTables(); // Update all tables and dropdowns
+        }
+
+        // Function to delete a staff member
+        function deleteStaffMember(staffNameToDelete) {
+            showConfirmation(
+                'Confirm Deletion',
+                `Are you sure you want to delete staff member "${staffNameToDelete}" and all their associated bills and payments? This action cannot be undone.`,
+                (confirmed) => {
+                    if (confirmed) {
+                        // Remove from allStaffNames set
+                        allStaffNames.delete(staffNameToDelete);
+
+                        // Filter out bills associated with this staff member
+                        billDetails = billDetails.filter(bill => bill.staffName !== staffNameToDelete);
+
+                        // Filter out payments associated with this staff member
+                        paymentHistory = paymentHistory.filter(payment => payment.staffName !== staffNameToDelete);
+
+                        showMessage(`Staff member "${staffNameToDelete}" and all their data deleted successfully.`);
+                        renderTables(); // Re-render all tables and dropdowns
+                        generateReport(); // Re-generate report in case the deleted staff was selected
+                        renderOverallTotals(); // Update overall totals
+                    } else {
+                        showMessage(`Deletion of "${staffNameToDelete}" cancelled.`);
+                    }
+                }
+            );
+        }
+
+        // Function to add a new bill
+        function addBill() {
+            const staffNameSelect = document.getElementById('billStaffNameSelect');
+            const staffName = staffNameSelect.value; // Get value from select
+            const billDate = document.getElementById('billDate').value;
+            const billNo = document.getElementById('billNo').value.trim();
+            const billAmount = parseFloat(document.getElementById('billAmount').value);
+
+            // Basic validation
+            if (!staffName || staffName === "" || !billDate || !billNo || isNaN(billAmount) || billAmount <= 0) {
+                showMessage('Please select a staff member and fill in all bill details correctly.');
+                return;
+            }
+
+            billDetails.push({
+                staffName: staffName,
+                billDate: billDate,
+                billNo: billNo,
+                billAmount: billAmount
+            });
+            allStaffNames.add(staffName); // Add to master staff list if new
+
+            // Clear form fields
+            staffNameSelect.value = ''; // Reset dropdown
+            document.getElementById('billDate').value = new Date().toISOString().split('T')[0]; // Reset to today
+            document.getElementById('billNo').value = '';
+            document.getElementById('billAmount').value = '';
+
+            showMessage('Bill added successfully!');
+            renderTables(); // Re-render all tables and update dropdowns
+            generateReport(); // Re-generate report to include new data if staff is selected
+            renderOverallTotals(); // Update overall totals
+        }
+
+        // Function to add a new payment
+        function addPayment() {
+            const staffNameSelect = document.getElementById('paymentStaffNameSelect');
+            const staffName = staffNameSelect.value; // Get value from select
+            const paymentDate = document.getElementById('paymentDate').value;
+            const amountPaid = parseFloat(document.getElementById('amountPaid').value);
+
+            // Basic validation
+            if (!staffName || staffName === "" || !paymentDate || isNaN(amountPaid) || amountPaid <= 0) {
+                showMessage('Please select a staff member and fill in all payment details correctly.');
+                return;
+            }
+
+            paymentHistory.push({
+                staffName: staffName,
+                paymentDate: paymentDate,
+                amountPaid: amountPaid
+            });
+            allStaffNames.add(staffName); // Add to master staff list if new
+
+            // Clear form fields
+            staffNameSelect.value = ''; // Reset dropdown
+            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0]; // Reset to today
+            document.getElementById('amountPaid').value = '';
+
+            showMessage('Payment added successfully!');
+            renderTables(); // Re-render all tables and update dropdowns
+            generateReport(); // Re-generate report to include new data if staff is selected
+            renderOverallTotals(); // Update overall totals
+        }
+
+        // Function to render the Bill Details table
+        function renderBillDetailsTable() {
+            const tableBody = document.getElementById('billDetailsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            billDetails.forEach(bill => {
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = bill.staffName;
+                row.insertCell().textContent = bill.billDate;
+                row.insertCell().textContent = bill.billNo;
+                row.insertCell().textContent = bill.billAmount.toFixed(2);
+            });
+        }
+
+        // Function to render the Payment History table
+        function renderPaymentHistoryTable() {
+            const tableBody = document.getElementById('paymentHistoryTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            paymentHistory.forEach(payment => {
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = payment.staffName;
+                row.insertCell().textContent = payment.paymentDate;
+                row.insertCell().textContent = payment.amountPaid.toFixed(2);
+            });
+        }
+
+        // Function to render the Summary table (Per-Staff Summary)
+        function renderSummaryTable() {
+            const tableBody = document.getElementById('summaryTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            const staffSummary = {}; // Object to hold summary data for each staff
+
+            // Calculate Total Bill for each staff
+            billDetails.forEach(bill => {
+                if (!staffSummary[bill.staffName]) {
+                    staffSummary[bill.staffName] = { totalBill: 0, totalPaid: 0, totalPending: 0 };
+                }
+                staffSummary[bill.staffName].totalBill += bill.billAmount;
+            });
+
+            // Calculate Total Paid for each staff
+            paymentHistory.forEach(payment => {
+                if (!staffSummary[payment.staffName]) {
+                    staffSummary[payment.staffName] = { totalBill: 0, totalPaid: 0, totalPending: 0 };
+                }
+                staffSummary[payment.staffName].totalPaid += payment.amountPaid;
+            });
+
+            // Calculate Total Pending and render rows
+            // Ensure all staff in allStaffNames are considered, even if they have 0 bills/payments
+            const allStaffForSummary = new Set([...allStaffNames, ...Object.keys(staffSummary)]);
+
+            Array.from(allStaffForSummary).sort().forEach(staffName => {
+                const summary = staffSummary[staffName] || { totalBill: 0, totalPaid: 0 }; // Initialize if staff has no transactions
+                summary.totalPending = summary.totalBill - summary.totalPaid;
+
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = staffName;
+                row.insertCell().textContent = summary.totalBill.toFixed(2);
+                row.insertCell().textContent = summary.totalPaid.toFixed(2);
+                row.insertCell().textContent = summary.totalPending.toFixed(2);
+            });
+        }
+
+        // Function to render the Staff List table
+        function renderStaffListTable() {
+            const tableBody = document.getElementById('staffListTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            Array.from(allStaffNames).sort().forEach(staffName => {
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = staffName;
+                const actionsCell = row.insertCell();
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('delete-button');
+                deleteButton.onclick = () => deleteStaffMember(staffName);
+                actionsCell.appendChild(deleteButton);
+            });
+        }
+
+        // Function to populate staff dropdowns (for Bill, Payment, and Report)
+        function populateStaffDropdowns() {
+            const billStaffSelect = document.getElementById('billStaffNameSelect');
+            const paymentStaffSelect = document.getElementById('paymentStaffNameSelect');
+            const reportStaffSelect = document.getElementById('reportStaffNameSelect'); // New report dropdown
+
+            // Store current selected values to restore after repopulating
+            const currentBillSelected = billStaffSelect.value;
+            const currentPaymentSelected = paymentStaffSelect.value;
+            const currentReportSelected = reportStaffSelect.value; // Store report selection
+
+            // Clear existing options (except the default "Select Staff")
+            billStaffSelect.innerHTML = '<option value="">Select Staff</option>';
+            paymentStaffSelect.innerHTML = '<option value="">Select Staff</option>';
+            reportStaffSelect.innerHTML = '<option value="">Select Staff</option>'; // Clear report dropdown
+
+            const sortedStaff = Array.from(allStaffNames).sort();
+
+            sortedStaff.forEach(name => {
+                const option1 = document.createElement('option');
+                option1.value = name;
+                option1.textContent = name;
+                billStaffSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = name;
+                option2.textContent = name;
+                paymentStaffSelect.appendChild(option2);
+
+                const option3 = document.createElement('option'); // For report dropdown
+                option3.value = name;
+                option3.textContent = name;
+                reportStaffSelect.appendChild(option3);
+            });
+
+            // Restore previously selected values if they still exist
+            if (allStaffNames.has(currentBillSelected)) {
+                billStaffSelect.value = currentBillSelected;
+            }
+            if (allStaffNames.has(currentPaymentSelected)) {
+                paymentStaffSelect.value = currentPaymentSelected;
+            }
+            if (allStaffNames.has(currentReportSelected)) { // Restore report selection
+                reportStaffSelect.value = currentReportSelected;
+            }
+        }
+
+        // Function to generate and display the staff report
+        function generateReport() {
+            const selectedStaff = document.getElementById('reportStaffNameSelect').value;
+            const reportBillsTableBody = document.getElementById('reportBillsTable').getElementsByTagName('tbody')[0];
+            const reportPaymentsTableBody = document.getElementById('reportPaymentsTable').getElementsByTagName('tbody')[0];
+            const reportPendingAmountBox = document.getElementById('reportPendingAmount');
+            const pendingAmountValueSpan = document.getElementById('pendingAmountValue');
+
+            reportBillsTableBody.innerHTML = ''; // Clear previous report
+            reportPaymentsTableBody.innerHTML = ''; // Clear previous report
+            reportPendingAmountBox.classList.add('hidden'); // Hide pending amount box by default
+
+            if (!selectedStaff) {
+                reportBillsTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500">Select a staff member to view bills.</td></tr>';
+                reportPaymentsTableBody.innerHTML = '<tr><td colspan="2" class="text-center text-gray-500">Select a staff member to view payments.</td></tr>';
+                pendingAmountValueSpan.textContent = '₹0.00';
+                return;
+            }
+
+            // Calculate total bill and total paid for the selected staff
+            let totalBillForReport = 0;
+            billDetails.filter(bill => bill.staffName === selectedStaff).forEach(bill => {
+                totalBillForReport += bill.billAmount;
+            });
+
+            let totalPaidForReport = 0;
+            paymentHistory.filter(payment => payment.staffName === selectedStaff).forEach(payment => {
+                totalPaidForReport += payment.amountPaid;
+            });
+
+            const pendingAmountForReport = totalBillForReport - totalPaidForReport;
+            pendingAmountValueSpan.textContent = `₹${pendingAmountForReport.toFixed(2)}`;
+            reportPendingAmountBox.classList.remove('hidden'); // Show the pending amount box
+
+            // Filter bills for the selected staff
+            const staffBills = billDetails.filter(bill => bill.staffName === selectedStaff);
+            if (staffBills.length > 0) {
+                staffBills.sort((a, b) => new Date(a.billDate) - new Date(b.billDate)).forEach(bill => {
+                    const row = reportBillsTableBody.insertRow();
+                    row.insertCell().textContent = bill.billDate;
+                    row.insertCell().textContent = bill.billNo;
+                    row.insertCell().textContent = bill.billAmount.toFixed(2);
+                });
+            } else {
+                reportBillsTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">No bills found for ${selectedStaff}.</td></tr>`;
+            }
+
+            // Filter payments for the selected staff
+            const staffPayments = paymentHistory.filter(payment => payment.staffName === selectedStaff);
+            if (staffPayments.length > 0) {
+                staffPayments.sort((a, b) => new Date(a.paymentDate) - new Date(b.paymentDate)).forEach(payment => {
+                    const row = reportPaymentsTableBody.insertRow();
+                    row.insertCell().textContent = payment.paymentDate;
+                    row.insertCell().textContent = payment.amountPaid.toFixed(2);
+                });
+            } else {
+                reportPaymentsTableBody.innerHTML = `<tr><td colspan="2" class="text-center text-gray-500">No payments found for ${selectedStaff}.</td></tr>`;
+            }
+        }
+
+        // Function to render the Overall Totals section
+        function renderOverallTotals() {
+            let totalBillAmount = 0;
+            billDetails.forEach(bill => {
+                totalBillAmount += bill.billAmount;
+            });
+
+            let totalPaymentReceived = 0;
+            paymentHistory.forEach(payment => {
+                totalPaymentReceived += payment.amountPaid;
+            });
+
+            const overallPending = totalBillAmount - totalPaymentReceived;
+
+            document.getElementById('overallTotalBill').textContent = `₹${totalBillAmount.toFixed(2)}`;
+            document.getElementById('overallTotalPayment').textContent = `₹${totalPaymentReceived.toFixed(2)}`;
+            document.getElementById('overallTotalPending').textContent = `₹${overallPending.toFixed(2)}`;
+        }
+
+        // Function to render all tables and update dropdowns
+        function renderTables() {
+            renderBillDetailsTable();
+            renderPaymentHistoryTable();
+            renderSummaryTable();
+            renderStaffListTable(); // Render the new staff list table
+            populateStaffDropdowns(); // Ensure dropdowns are always fresh
+            renderOverallTotals(); // Render overall totals
+        }
+
+        // Function to switch between tabs
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+
+            // Show the selected tab content
+            document.getElementById(tabId).classList.remove('hidden');
+
+            // Set the selected value in the main dropdown
+            const mainTabSelect = document.getElementById('mainTabSelect');
+            if (mainTabSelect) {
+                mainTabSelect.value = tabId;
+            }
+
+            // If the report tab is shown, generate the report immediately
+            if (tabId === 'reportTab') {
+                generateReport();
+            }
+            // If the overall totals tab is shown, render its content
+            if (tabId === 'overallTotalsTab') {
+                renderOverallTotals();
+            }
+        }
+
+        // Initial setup when the page loads
+        window.onload = function() {
+            // Set default date for date inputs to today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('billDate').value = today;
+            document.getElementById('paymentDate').value = today;
+
+            // Add some initial sample data
+            billDetails.push(
+                { staffName: 'Priya', billDate: '2025-07-01', billNo: 'D001', billAmount: 1500 },
+                { staffName: 'Rahul', billDate: '2025-07-05', billNo: 'D002', billAmount: 2000 },
+                { staffName: 'Priya', billDate: '2025-07-10', billNo: 'D003', billAmount: 1200 },
+                { staffName: 'Amit', billDate: '2025-07-12', billNo: 'D004', billAmount: 800 }
+            );
+
+            paymentHistory.push(
+                { staffName: 'Priya', paymentDate: '2025-07-15', amountPaid: 1000 },
+                { staffName: 'Rahul', paymentDate: '2025-07-20', amountPaid: 2000 },
+                { staffName: 'Priya', paymentDate: '2025-07-25', amountPaid: 500 }
+            );
+
+            // Populate allStaffNames from initial data
+            billDetails.forEach(bill => allStaffNames.add(bill.staffName));
+            paymentHistory.forEach(payment => allStaffNames.add(payment.staffName));
+
+            renderTables(); // Render tables with initial data and populate dropdowns
+            // Set initial tab to Bill Details, and ensure the dropdown reflects this
+            showTab('billDetailsTab');
+        };
+    </script>
+</body>
+</html>
