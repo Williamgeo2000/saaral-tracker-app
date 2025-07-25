@@ -221,14 +221,24 @@
             padding: 15px 20px;
             margin-bottom: 25px;
             text-align: center;
+            display: flex; /* Use flexbox for horizontal layout */
+            justify-content: space-around; /* Distribute items with space around them */
+            flex-wrap: wrap; /* Allow items to wrap to the next line */
+            gap: 10px; /* Space between items */
         }
-        .report-summary-box p {
-            font-size: 1.125rem;
+        .report-summary-item { /* New class for individual summary items in report */
+            flex: 1; /* Allow items to grow and shrink */
+            min-width: 150px; /* Minimum width for each item */
+            text-align: center;
+        }
+        .report-summary-item p {
+            font-size: 1.0rem; /* Slightly smaller for multiple items */
             font-weight: 600;
             color: #2563eb;
+            margin-bottom: 4px;
         }
-        .report-summary-box span {
-            font-size: 1.5rem;
+        .report-summary-item span {
+            font-size: 1.3rem; /* Slightly smaller for multiple items */
             font-weight: 700;
             color: #1d4ed8;
         }
@@ -295,7 +305,7 @@
         <div class="flex justify-center mb-6">
             <div class="input-group w-full max-w-xs">
                 <label for="mainTabSelect" class="sr-only">Select Section</label>
-                <select id="mainTabSelect" class="rounded-lg" onchange="showTab(this.value)">
+                <select id="mainTabSelect" class="rounded-lg">
                     <option value="staffListTab">Staff List</option>
                     <option value="billDetailsTab" selected>Bill Details</option>
                     <option value="paymentHistoryTab">Payment History</option>
@@ -319,7 +329,7 @@
                     <input type="tel" id="newStaffMobile" placeholder="e.g., 9876543210" class="rounded-lg">
                 </div>
                 <div class="md:col-span-2">
-                    <button onclick="addStaffMember()" class="action-button w-full">Add Staff</button>
+                    <button id="addStaffMemberBtn" class="action-button w-full">Add Staff</button>
                 </div>
             </div>
 
@@ -364,7 +374,7 @@
                     <input type="number" id="billAmount" placeholder="e.g., 1500" class="rounded-lg">
                 </div>
             </div>
-            <button onclick="addBill()" class="action-button w-full mb-8">Add Bill</button>
+            <button id="addBillBtn" class="action-button w-full mb-8">Add Bill</button>
 
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">All Bills</h2>
             <div class="table-container">
@@ -404,7 +414,7 @@
                     <input type="number" id="amountPaid" placeholder="e.g., 1000" class="rounded-lg">
                 </div>
             </div>
-            <button onclick="addPayment()" class="action-button w-full mb-8">Add Payment</button>
+            <button id="addPaymentBtn" class="action-button w-full mb-8">Add Payment</button>
 
             <h2 class="text-2xl font-semibold text-gray-700 mb-4">All Payments</h2>
             <div class="table-container">
@@ -449,7 +459,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div class="input-group">
                     <label for="reportStaffNameSelect">Select Staff Member</label>
-                    <select id="reportStaffNameSelect" class="rounded-lg" onchange="generateReport()">
+                    <select id="reportStaffNameSelect" class="rounded-lg">
                         <option value="">Select Staff</option>
                         <!-- Staff names will be populated here by JavaScript -->
                     </select>
@@ -457,9 +467,20 @@
             </div>
 
             <div id="reportContent">
-                <!-- Pending amount will be displayed here -->
-                <div id="reportPendingAmount" class="report-summary-box hidden">
-                    <p>Pending Amount: <span id="pendingAmountValue">₹0.00</span></p>
+                <!-- New: Total Bill Amount and Total Paid Amount in Report Section -->
+                <div class="report-summary-box">
+                    <div class="report-summary-item">
+                        <p>Total Bill Amount</p>
+                        <span id="reportTotalBillValue">₹0.00</span>
+                    </div>
+                    <div class="report-summary-item">
+                        <p>Total Paid Amount</p>
+                        <span id="reportTotalPaidValue">₹0.00</span>
+                    </div>
+                    <div class="report-summary-item">
+                        <p>Pending Amount</p>
+                        <span id="pendingAmountValue">₹0.00</span>
+                    </div>
                 </div>
 
                 <h3 class="text-xl font-semibold text-gray-700 mb-3 mt-6">Bills Taken</h3>
@@ -499,13 +520,13 @@
                             <path d="M7.749 1.554a.75.75 0 0 0-1.498 0L3.872 6.73c.433.117.882.26 1.33.418.895.319 1.759.724 2.572 1.177l.16.096c.644.384 1.18.857 1.574 1.385.405.54.704 1.139.872 1.787.086.331.157.667.201 1.002a.75.75 0 0 0 1.499-.001 20.328 20.328 0 0 0-.21-1.206c-.161-.59-.405-1.144-.72-1.657-.367-.597-.843-1.134-1.403-1.588l-.16-.096a6.016 6.016 0 0 1-2.078-.975L7.749 1.554ZM10.32 8.79a.75.75 0 0 0-1.223.804c.047.073.1.147.159.22.251.307.545.617.876.924.33.307.69.597 1.07.86l.16.096c.405.242.775.457 1.109.64.32.175.61.32.86.43.209.096.39.16.54.195a.75.75 0 0 0 .285-1.472 4.498 4.498 0 0 0-.79-.176 5.003 5.003 0 0 1-.77-.36 6.016 6.016 0 0 1-1.403-.86l-.16-.096c-.38-.263-.74-.553-1.07-.86-.33-.307-.625-.617-.876-.924-.059-.073-.112-.147-.159-.22ZM13.68 15.21a.75.75 0 0 0 1.223-.804c-.047-.073-.1-.147-.159-.22-.251-.307-.545-.617-.876-.924-.33-.307-.69-.597-1.07-.86l-.16-.096a6.016 6.016 0 0 1-1.403-.86 5.003 5.003 0 0 1-.77-.36c-.209-.096-.39-.16-.54-.195a.75.75 0 0 0-.285 1.472 4.498 4.498 0 0 0 .79.176c.32.175.61.32.86.43.33.15.69.264 1.109.347l.16.096c.38.263.74.553 1.07.86.33.307.625.617.876.924.059.073.112.147.159.22Z" />
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM2.25 12c0 2.789 1.125 5.304 2.933 7.163l1.297-1.297a.75.75 0 0 1 1.06 0c.38.38.38 1.003 0 1.383l-1.44 1.439A9.75 9.75 0 0 0 12 21.75c2.789 0 5.304-1.125 7.163-2.933l-1.297-1.297a.75.75 0 0 1 0-1.06c.38-.38 1.003-.38 1.383 0l1.439 1.44A9.75 9.75 0 0 0 21.75 12c0-2.789-1.125-5.304-2.933-7.163l-1.297 1.297a.75.75 0 0 1-1.06 0c-.38.38-.38-1.003 0-1.383l1.439-1.44A9.75 9.75 0 0 0 12 2.25c-2.789 0-5.304 1.125-7.163 2.933l1.297 1.297a.75.75 0 0 1 0 1.06c-.38.38-.38-1.003 0-1.383l1.44 1.439A9.75 9.75 0 0 0 2.25 12Z" clip-rule="evenodd" />
                         </svg>
-                        Send via SMS
+                        SMS வழியாக அனுப்பவும்
                     </a>
                     <a id="whatsappButton" href="#" class="send-button" target="_blank" rel="noopener noreferrer" disabled>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                             <path d="M12 0C5.373 0 0 5.373 0 12c0 2.067.534 4.02 1.5 5.72l-1.5 4.78 5-1.5c1.693.966 3.646 1.5 5.72 1.5 6.627 0 12-5.373 12-12S18.627 0 12 0zm0 2C17.522 2 22 6.478 22 12c0 5.523-4.478 10-10 10-1.993 0-3.86-.585-5.464-1.6L4 20l1.176-3.764c-1.026-1.604-1.6-3.471-1.6-5.464C3.522 6.478 8 2 12 2zm-2.25 5.5h-.5c-.276 0-.5.224-.5.5v2.5c0 .276.224.5.5.5h.5c.276 0 .5-.224.5-.5v-2.5c0-.276-.224-.5-.5-.5zm4.5 0h-.5c-.276 0-.5.224-.5.5v2.5c0 .276.224.5.5.5h.5c.276 0 .5-.224.5-.5v-2.5c0-.276-.224-.5-.5-.5zM12 11c-2.761 0-5 2.239-5 5s2.239 5 5 5 5-2.239 5-5-2.239-5-5-5zm0 1c2.209 0 4 1.791 4 4s-1.791 4-4 4-4-1.791-4-4 1.791-4 4-4zm-2 2h4v2h-4v-2z"/>
                         </svg>
-                        Send via WhatsApp
+                        WhatsApp வழியாக அனுப்பவும்
                     </a>
                 </div>
             </div>
@@ -601,7 +622,7 @@
         }
 
         // Function to handle confirmation dialog response
-        function handleConfirmation(confirmed) {
+        window.handleConfirmation = function(confirmed) { // Made global
             const dialog = document.getElementById('confirmationDialog');
             dialog.classList.remove('show');
             if (confirmationCallback) {
@@ -613,7 +634,7 @@
         // --- Firestore Operations ---
 
         // Function to add a new staff member to Firestore
-        async function addStaffMember() {
+        window.addStaffMember = async function() { // Made global
             const newStaffNameInput = document.getElementById('newStaffName');
             const newStaffMobileInput = document.getElementById('newStaffMobile');
             const staffName = newStaffNameInput.value.trim();
@@ -652,7 +673,7 @@
         }
 
         // Function to delete a staff member from Firestore and related data
-        async function deleteStaffMember(staffNameToDelete) {
+        window.deleteStaffMember = async function(staffNameToDelete) { // Made global
             showConfirmation(
                 'Confirm Deletion',
                 `Are you sure you want to delete staff member "${staffNameToDelete}" and all their associated bills and payments? This action cannot be undone.`,
@@ -698,7 +719,7 @@
         }
 
         // Function to add a new bill to Firestore
-        async function addBill() {
+        window.addBill = async function() { // Made global
             const staffNameSelect = document.getElementById('billStaffNameSelect');
             const staffName = staffNameSelect.value;
             const billDate = document.getElementById('billDate').value;
@@ -743,7 +764,7 @@
         }
 
         // Function to add a new payment to Firestore
-        async function addPayment() {
+        window.addPayment = async function() { // Made global
             const staffNameSelect = document.getElementById('paymentStaffNameSelect');
             const staffName = staffNameSelect.value;
             const paymentDate = document.getElementById('paymentDate').value;
@@ -893,6 +914,7 @@
                 reportStaffSelect.appendChild(option3);
             });
 
+            // Restore previously selected values if they still exist
             if (staffDetails[currentBillSelected]) {
                 billStaffSelect.value = currentBillSelected;
             }
@@ -904,26 +926,30 @@
             }
         }
 
-        function generateReport() {
+        window.generateReport = function() { // Made global
             const selectedStaff = document.getElementById('reportStaffNameSelect').value;
             const reportBillsTableBody = document.getElementById('reportBillsTable').getElementsByTagName('tbody')[0];
             const reportPaymentsTableBody = document.getElementById('reportPaymentsTable').getElementsByTagName('tbody')[0];
-            const reportPendingAmountBox = document.getElementById('reportPendingAmount');
-            const pendingAmountValueSpan = document.getElementById('pendingAmountValue');
+            const reportTotalBillValueSpan = document.getElementById('reportTotalBillValue'); // New span for total bill
+            const reportTotalPaidValueSpan = document.getElementById('reportTotalPaidValue'); // New span for total paid
+            const pendingAmountValueSpan = document.getElementById('pendingAmountValue'); // Existing span for pending
 
             const smsButton = document.getElementById('smsButton');
             const whatsappButton = document.getElementById('whatsappButton');
 
             reportBillsTableBody.innerHTML = '';
             reportPaymentsTableBody.innerHTML = '';
-            reportPendingAmountBox.classList.add('hidden');
+            // Hide all report summary items by default
+            reportTotalBillValueSpan.textContent = '₹0.00';
+            reportTotalPaidValueSpan.textContent = '₹0.00';
+            pendingAmountValueSpan.textContent = '₹0.00';
+
             smsButton.setAttribute('disabled', 'true');
             whatsappButton.setAttribute('disabled', 'true');
 
             if (!selectedStaff) {
                 reportBillsTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500">Select a staff member to view bills.</td></tr>';
                 reportPaymentsTableBody.innerHTML = '<tr><td colspan="2" class="text-center text-gray-500">Select a staff member to view payments.</td></tr>';
-                pendingAmountValueSpan.textContent = '₹0.00';
                 return;
             }
 
@@ -938,8 +964,12 @@
             });
 
             const pendingAmountForReport = totalBillForReport - totalPaidForReport;
+
+            // Update the new total spans
+            reportTotalBillValueSpan.textContent = `₹${totalBillForReport.toFixed(2)}`;
+            reportTotalPaidValueSpan.textContent = `₹${totalPaidForReport.toFixed(2)}`;
             pendingAmountValueSpan.textContent = `₹${pendingAmountForReport.toFixed(2)}`;
-            reportPendingAmountBox.classList.remove('hidden');
+
 
             const staffBills = billDetails.filter(bill => bill.staffName === selectedStaff);
             if (staffBills.length > 0) {
@@ -1013,7 +1043,7 @@
             renderOverallTotals(); // This will also update userIdDisplay
         }
 
-        function showTab(tabId) {
+        window.showTab = function(tabId) { // Made global
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.add('hidden');
             });
@@ -1023,12 +1053,22 @@
                 mainTabSelect.value = tabId;
             }
 
-            if (tabId === 'reportTab') {
-                generateReport();
-            }
-            if (tabId === 'overallTotalsTab') {
+            // Call render functions for the newly shown tab
+            // These calls ensure the content is refreshed when a tab is selected
+            if (tabId === 'staffListTab') {
+                renderStaffListTable();
+            } else if (tabId === 'billDetailsTab') {
+                renderBillDetailsTable();
+            } else if (tabId === 'paymentHistoryTab') {
+                renderPaymentHistoryTable();
+            } else if (tabId === 'summaryTab') {
+                renderSummaryTable();
+            } else if (tabId === 'reportTab') {
+                generateReport(); // This will also update dropdowns
+            } else if (tabId === 'overallTotalsTab') {
                 renderOverallTotals();
             }
+            populateStaffDropdowns(); // Always ensure dropdowns are up-to-date when switching tabs
         }
 
         // --- Firebase Initialization and Data Loading ---
@@ -1041,7 +1081,7 @@
             // Set a timeout to hide loading overlay and show error if something goes wrong
             const loadingTimeout = setTimeout(() => {
                 loadingOverlay.textContent = "Loading timed out. Check console for errors or refresh.";
-                loadingOverlay.classList.remove('hidden'); // Ensure it's visible if timeout occurs
+                loadingOverlay.style.display = 'flex'; // Ensure it's visible if timeout occurs
                 mainContent.classList.add('hidden'); // Ensure main content stays hidden
                 console.error("Firebase initialization timed out.");
             }, 15000); // 15 seconds timeout
@@ -1099,12 +1139,18 @@
                         // The overlay will be hidden and main content shown after initial data is rendered
                         // by the renderTables() call within setupFirestoreListeners.
                         console.log("App loaded and default tab shown.");
+                        
+                        // Explicitly hide loading overlay and show main content here
+                        loadingOverlay.style.display = 'none'; // Use display: none for immediate hiding
+                        mainContent.classList.remove('hidden'); // Ensure main content is visible
+                        showTab('billDetailsTab'); // Show default tab after loading
                     } else {
                         userId = null;
                         console.log("No user is signed in. Data will not persist.");
                         showMessage("Not authenticated. Data will not persist.");
                         loadingOverlay.textContent = "Authentication Failed.";
                         mainContent.classList.add('hidden'); // Keep main content hidden if not authenticated
+                        loadingOverlay.style.display = 'flex'; // Ensure overlay is visible if auth fails
                     }
                 });
 
@@ -1133,15 +1179,12 @@
                 });
                 console.log("Staff details updated:", staffDetails);
                 renderTables(); // Re-render all tables
-                // Hide loading overlay and show main content after first data load
-                document.getElementById('loadingOverlay').classList.add('hidden');
-                document.getElementById('mainContent').classList.remove('hidden');
-                showTab('billDetailsTab'); // Show default tab after loading
+                // The main content and loading overlay are handled in onAuthStateChanged
             }, (error) => {
                 console.error("Error listening to staff_members: ", error);
                 showMessage(`Error loading staff data: ${error.message}`);
-                // If there's an error loading data, still hide loading overlay to show error message
-                document.getElementById('loadingOverlay').classList.add('hidden');
+                // If there's an error loading data, still allow main content to show error message
+                document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('mainContent').classList.remove('hidden');
             });
 
@@ -1203,6 +1246,15 @@
 
             // Initialize Firebase and load data
             initializeFirebaseAndLoadData();
+
+            // Attach event listeners for buttons and select dropdowns after DOM is loaded
+            document.getElementById('mainTabSelect').addEventListener('change', function() {
+                window.showTab(this.value);
+            });
+            document.getElementById('addStaffMemberBtn').addEventListener('click', window.addStaffMember);
+            document.getElementById('addBillBtn').addEventListener('click', window.addBill);
+            document.getElementById('addPaymentBtn').addEventListener('click', window.addPayment);
+            document.getElementById('reportStaffNameSelect').addEventListener('change', window.generateReport);
         };
     </script>
 </body>
