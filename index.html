@@ -1114,46 +1114,37 @@
                 console.log("Firebase app, auth, and db initialized.");
 
                 // Authenticate user anonymously
-                console.log("Attempting authentication...");
-                try {
-                    console.log("Signing in anonymously...");
-                    await signInAnonymously(auth);
-                    console.log("Anonymous sign-in attempted.");
-                } catch (authError) {
-                    console.error("Authentication failed: ", authError);
-                    showMessage(`Authentication failed. Data will not persist. Error: ${authError.message}`);
-                    loadingOverlay.textContent = `Authentication Failed: ${authError.code}`; // Show auth error code
-                    clearTimeout(loadingTimeout); // Clear timeout as we have an immediate error
-                    return; // Stop execution if authentication fails
-                }
+console.log("Attempting authentication...");
+try {
+    console.log("Signing in anonymously...");
+    await signInAnonymously(auth);
+    console.log("Anonymous sign-in attempted.");
+} catch (authError) {
+    // ... (rest of the catch block)
+}
 
-                // Listen for auth state changes to get userId
-                // This listener ensures we only proceed once authentication is confirmed
-                onAuthStateChanged(auth, (user) => {
-                    clearTimeout(loadingTimeout); // Clear timeout once auth state is known
-                    if (user) {
-                        userId = user.uid;
-                        console.log("Authenticated with userId:", userId);
-                        // Once authenticated, start listening to Firestore collections
-                        setupFirestoreListeners(); // This triggers data loading and rendering
-                        // The overlay will be hidden and main content shown after initial data is rendered
-                        // by the renderTables() call within setupFirestoreListeners.
-                        console.log("App loaded and default tab shown.");
-                        
-                        // Explicitly hide loading overlay and show main content here
-                        loadingOverlay.style.display = 'none'; // Use display: none for immediate hiding
-                        mainContent.classList.remove('hidden'); // Ensure main content is visible
-                        showTab('billDetailsTab'); // Show default tab after loading
-                    } else {
-                        userId = null;
-                        console.log("No user is signed in. Data will not persist.");
-                        showMessage("Not authenticated. Data will not persist.");
-                        loadingOverlay.textContent = "Authentication Failed.";
-                        mainContent.classList.add('hidden'); // Keep main content hidden if not authenticated
-                        loadingOverlay.style.display = 'flex'; // Ensure overlay is visible if auth fails
-                    }
-                });
-
+// Listen for auth state changes to get userId
+onAuthStateChanged(auth, (user) => {
+    clearTimeout(loadingTimeout);
+    if (user) {
+        // *** IMPORTANT CHANGE HERE: Hardcode userId for testing sync ***
+        userId = "YOUR_FIXED_UNIQUE_USER_ID"; // <--- REPLACE THIS with a fixed string, e.g., "my-saaral-tracker-user-id"
+        console.log("Authenticated with FIXED userId:", userId);
+        // Once authenticated, start listening to Firestore collections
+        setupFirestoreListeners();
+        loadingOverlay.style.display = 'none';
+        mainContent.classList.remove('hidden');
+        showTab('billDetailsTab');
+        console.log("App loaded and default tab shown.");
+    } else {
+        userId = null;
+        console.log("No user is signed in. Data will not persist.");
+        showMessage("Not authenticated. Data will not persist.");
+        loadingOverlay.textContent = "Authentication Failed.";
+        mainContent.classList.add('hidden');
+        loadingOverlay.style.display = 'flex';
+    }
+});
             } catch (e) {
                 console.error("Error during Firebase initialization or authentication setup: ", e);
                 showMessage("Failed to initialize app. Please check console for errors.");
