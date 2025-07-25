@@ -269,10 +269,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 3000;
+            z-index: 3000; /* Ensure it's on top */
             font-size: 1.5rem;
             font-weight: bold;
             color: #3b82f6;
+        }
+        #mainContent { /* Ensure main content is below overlay when hidden */
+            z-index: 1;
+        }
+        #userIdDisplay {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 15px;
+            word-break: break-all;
         }
     </style>
 </head>
@@ -518,6 +527,9 @@
                     <p>Overall Pending</p>
                     <span id="overallTotalPending">₹0.00</span>
                 </div>
+            </div>
+            <div id="userIdDisplay" class="text-center">
+                <!-- User ID will be displayed here -->
             </div>
         </div>
 
@@ -984,6 +996,12 @@
             document.getElementById('overallTotalBill').textContent = `₹${totalBillAmount.toFixed(2)}`;
             document.getElementById('overallTotalPayment').textContent = `₹${totalPaymentReceived.toFixed(2)}`;
             document.getElementById('overallTotalPending').textContent = `₹${overallPending.toFixed(2)}`;
+            
+            // Update userId display
+            const userIdDisplay = document.getElementById('userIdDisplay');
+            if (userIdDisplay) {
+                userIdDisplay.textContent = `User ID: ${userId || 'Not authenticated'}`;
+            }
         }
 
         function renderTables() {
@@ -992,7 +1010,7 @@
             renderSummaryTable();
             renderStaffListTable();
             populateStaffDropdowns();
-            renderOverallTotals();
+            renderOverallTotals(); // This will also update userIdDisplay
         }
 
         function showTab(tabId) {
@@ -1017,6 +1035,17 @@
 
         async function initializeFirebaseAndLoadData() {
             console.log("Initializing Firebase and loading data...");
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const mainContent = document.getElementById('mainContent');
+
+            // Set a timeout to hide loading overlay and show error if something goes wrong
+            const loadingTimeout = setTimeout(() => {
+                loadingOverlay.textContent = "Loading timed out. Check console for errors or refresh.";
+                loadingOverlay.classList.remove('hidden'); // Ensure it's visible if timeout occurs
+                mainContent.classList.add('hidden'); // Ensure main content stays hidden
+                console.error("Firebase initialization timed out.");
+            }, 15000); // 15 seconds timeout
+
             try {
                 // Firebase Configuration: Directly use the provided config
                 const firebaseConfig = {
@@ -1033,7 +1062,8 @@
                 if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
                     console.error("Firebase config is incomplete or invalid. Cannot initialize Firebase.");
                     showMessage("App configuration missing or invalid. Please contact support.");
-                    document.getElementById('loadingOverlay').textContent = "Error: Invalid Config.";
+                    loadingOverlay.textContent = "Error: Invalid Config.";
+                    clearTimeout(loadingTimeout); // Clear timeout as we have an immediate error
                     return;
                 }
 
@@ -1052,33 +1082,37 @@
                 } catch (authError) {
                     console.error("Authentication failed: ", authError);
                     showMessage(`Authentication failed. Data will not persist. Error: ${authError.message}`);
-                    document.getElementById('loadingOverlay').textContent = "Authentication Failed.";
+                    loadingOverlay.textContent = `Authentication Failed: ${authError.code}`; // Show auth error code
+                    clearTimeout(loadingTimeout); // Clear timeout as we have an immediate error
                     return; // Stop execution if authentication fails
                 }
 
                 // Listen for auth state changes to get userId
+                // This listener ensures we only proceed once authentication is confirmed
                 onAuthStateChanged(auth, (user) => {
+                    clearTimeout(loadingTimeout); // Clear timeout once auth state is known
                     if (user) {
                         userId = user.uid;
                         console.log("Authenticated with userId:", userId);
                         // Once authenticated, start listening to Firestore collections
-                        setupFirestoreListeners();
-                        document.getElementById('loadingOverlay').classList.add('hidden');
-                        document.getElementById('mainContent').classList.remove('hidden');
-                        showTab('billDetailsTab'); // Show default tab after loading
+                        setupFirestoreListeners(); // This triggers data loading and rendering
+                        // The overlay will be hidden and main content shown after initial data is rendered
+                        // by the renderTables() call within setupFirestoreListeners.
                         console.log("App loaded and default tab shown.");
                     } else {
                         userId = null;
                         console.log("No user is signed in. Data will not persist.");
                         showMessage("Not authenticated. Data will not persist.");
-                        document.getElementById('loadingOverlay').textContent = "Authentication Failed.";
+                        loadingOverlay.textContent = "Authentication Failed.";
+                        mainContent.classList.add('hidden'); // Keep main content hidden if not authenticated
                     }
                 });
 
             } catch (e) {
                 console.error("Error during Firebase initialization or authentication setup: ", e);
                 showMessage("Failed to initialize app. Please check console for errors.");
-                document.getElementById('loadingOverlay').textContent = "Error during startup.";
+                loadingOverlay.textContent = "Error during startup.";
+                clearTimeout(loadingTimeout); // Clear timeout on any caught error
             }
         }
 
@@ -1099,9 +1133,16 @@
                 });
                 console.log("Staff details updated:", staffDetails);
                 renderTables(); // Re-render all tables
+                // Hide loading overlay and show main content after first data load
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
+                showTab('billDetailsTab'); // Show default tab after loading
             }, (error) => {
                 console.error("Error listening to staff_members: ", error);
-                showMessage("Error loading staff data.");
+                showMessage(`Error loading staff data: ${error.message}`);
+                // If there's an error loading data, still hide loading overlay to show error message
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                document.getElementById('mainContent').classList.remove('hidden');
             });
 
             // Listener for Bills
@@ -1116,13 +1157,16 @@
                     const dateA = new Date(a.billDate);
                     const dateB = new Date(b.billDate);
                     if (dateA - dateB !== 0) return dateA - dateB;
-                    return (a.timestamp && b.timestamp) ? a.timestamp.toDate() - b.timestamp.toDate() : 0;
+                    // Fallback to current timestamp if original timestamp is missing (e.g., old data)
+                    const tsA = a.timestamp ? a.timestamp.toDate() : new Date();
+                    const tsB = b.timestamp ? b.timestamp.toDate() : new Date();
+                    return tsA - tsB;
                 });
                 console.log("Bill details updated:", billDetails);
                 renderTables(); // Re-render all tables
             }, (error) => {
                 console.error("Error listening to bills: ", error);
-                showMessage("Error loading bill data.");
+                showMessage(`Error loading bill data: ${error.message}`);
             });
 
             // Listener for Payments
@@ -1137,13 +1181,16 @@
                     const dateA = new Date(a.paymentDate);
                     const dateB = new Date(b.paymentDate);
                     if (dateA - dateB !== 0) return dateA - dateB;
-                    return (a.timestamp && b.timestamp) ? a.timestamp.toDate() - b.timestamp.toDate() : 0;
+                    // Fallback to current timestamp if original timestamp is missing (e.g., old data)
+                    const tsA = a.timestamp ? a.timestamp.toDate() : new Date();
+                    const tsB = b.timestamp ? b.timestamp.toDate() : new Date();
+                    return tsA - tsB;
                 });
                 console.log("Payment history updated:", paymentHistory);
                 renderTables(); // Re-render all tables
             }, (error) => {
                 console.error("Error listening to payments: ", error);
-                showMessage("Error loading payment data.");
+                showMessage(`Error loading payment data: ${error.message}`);
             });
         }
 
