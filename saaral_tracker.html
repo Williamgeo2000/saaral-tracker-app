@@ -10,7 +10,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Saaral Tracker">
     <link rel="apple-touch-icon" href="https://placehold.co/180x180/007AFF/FFFFFF?text=SST">
-    <!-- You can replace the href above with a URL to your actual app icon (e.g., a logo) -->
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -36,7 +35,6 @@
             flex-direction: column;
             gap: 20px;
         }
-        /* No more .tab-button styles as we're using a select dropdown */
         .input-group label {
             font-weight: 500;
             color: #4b5563; /* Gray-700 */
@@ -46,8 +44,8 @@
         .input-group input[type="text"],
         .input-group input[type="date"],
         .input-group input[type="number"],
-        .input-group input[type="tel"], /* Added styling for tel input */
-        .input-group select { /* Added select to styling */
+        .input-group input[type="tel"],
+        .input-group select {
             width: 100%;
             padding: 10px 14px;
             border: 1px solid #d1d5db; /* Gray-300 */
@@ -56,7 +54,7 @@
             transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
         .input-group input:focus,
-        .input-group select:focus { /* Added select focus styling */
+        .input-group select:focus {
             outline: none;
             border-color: #3b82f6; /* Blue-500 */
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
@@ -89,7 +87,7 @@
         .delete-button:hover {
             background-color: #dc2626; /* Red-600 */
         }
-        .send-button { /* New style for SMS/WhatsApp buttons */
+        .send-button {
             background-color: #3b82f6; /* Blue-500 */
             color: white;
             padding: 10px 18px;
@@ -108,33 +106,32 @@
             cursor: not-allowed;
         }
         table {
-            border-collapse: separate; /* For rounded corners on table */
+            border-collapse: separate;
             border-spacing: 0;
-            overflow: hidden; /* Ensures rounded corners are visible */
+            overflow: hidden;
         }
         th, td {
             padding: 12px 16px;
             text-align: left;
-            border-bottom: 1px solid #e5e7eb; /* Gray-200 */
+            border-bottom: 1px solid #e5e7eb;
         }
         th {
-            background-color: #f9fafb; /* Lightest gray for header */
+            background-color: #f9fafb;
             font-weight: 600;
-            color: #374151; /* Gray-800 */
+            color: #374151;
             text-transform: uppercase;
-            font-size: 0.875rem; /* Smaller font for headers */
+            font-size: 0.875rem;
         }
         tr:last-child td {
             border-bottom: none;
         }
         .table-container {
-            max-height: 400px; /* Fixed height for scrollable tables */
+            max-height: 400px;
             overflow-y: auto;
-            border: 1px solid #e5e7eb; /* Border around scrollable area */
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
-            margin-bottom: 20px; /* Space between tables if multiple */
+            margin-bottom: 20px;
         }
-        /* Style for the message box */
         .message-box {
             position: fixed;
             top: 50%;
@@ -147,13 +144,12 @@
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
-            pointer-events: none; /* Allows clicks to pass through when hidden */
+            pointer-events: none;
         }
         .message-box.show {
             opacity: 1;
             pointer-events: auto;
         }
-        /* Confirmation dialog styles */
         .confirmation-dialog {
             position: fixed;
             top: 0;
@@ -205,40 +201,40 @@
             transition: background-color 0.2s ease-in-out;
         }
         .confirmation-buttons .confirm-yes {
-            background-color: #ef4444; /* Red-500 */
+            background-color: #ef4444;
             color: white;
         }
         .confirmation-buttons .confirm-yes:hover {
-            background-color: #dc2626; /* Red-600 */
+            background-color: #dc2626;
         }
         .confirmation-buttons .confirm-no {
-            background-color: #e5e7eb; /* Gray-200 */
+            background-color: #e5e7eb;
             color: #4b5563;
         }
         .confirmation-buttons .confirm-no:hover {
-            background-color: #d1d5db; /* Gray-300 */
+            background-color: #d1d5db;
         }
         .report-summary-box {
-            background-color: #e0f2fe; /* Light blue background */
-            border: 1px solid #90cdf4; /* Blue border */
+            background-color: #e0f2fe;
+            border: 1px solid #90cdf4;
             border-radius: 8px;
             padding: 15px 20px;
             margin-bottom: 25px;
             text-align: center;
         }
         .report-summary-box p {
-            font-size: 1.125rem; /* Larger font */
+            font-size: 1.125rem;
             font-weight: 600;
-            color: #2563eb; /* Darker blue text */
+            color: #2563eb;
         }
         .report-summary-box span {
-            font-size: 1.5rem; /* Even larger for amount */
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #1d4ed8; /* Even darker blue */
+            color: #1d4ed8;
         }
         .total-summary-box {
-            background-color: #d1fae5; /* Light green background */
-            border: 1px solid #34d399; /* Green border */
+            background-color: #d1fae5;
+            border: 1px solid #34d399;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
@@ -253,20 +249,37 @@
             min-width: 200px;
         }
         .total-summary-item p {
-            font-size: 1.25rem; /* Larger font */
+            font-size: 1.25rem;
             font-weight: 600;
-            color: #065f46; /* Darker green text */
+            color: #065f46;
             margin-bottom: 5px;
         }
         .total-summary-item span {
-            font-size: 2rem; /* Even larger for amount */
+            font-size: 2rem;
             font-weight: 700;
-            color: #047857; /* Even darker green */
+            color: #047857;
+        }
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="loadingOverlay">Loading...</div>
+
+    <div class="container hidden" id="mainContent">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Saaral Staff Payment Tracker</h1>
 
         <!-- Tab Navigation Dropdown -->
@@ -477,13 +490,13 @@
                             <path d="M7.749 1.554a.75.75 0 0 0-1.498 0L3.872 6.73c.433.117.882.26 1.33.418.895.319 1.759.724 2.572 1.177l.16.096c.644.384 1.18.857 1.574 1.385.405.54.704 1.139.872 1.787.086.331.157.667.201 1.002a.75.75 0 0 0 1.499-.001 20.328 20.328 0 0 0-.21-1.206c-.161-.59-.405-1.144-.72-1.657-.367-.597-.843-1.134-1.403-1.588l-.16-.096a6.016 6.016 0 0 1-2.078-.975L7.749 1.554ZM10.32 8.79a.75.75 0 0 0-1.223.804c.047.073.1.147.159.22.251.307.545.617.876.924.33.307.69.597 1.07.86l.16.096c.405.242.775.457 1.109.64.32.175.61.32.86.43.209.096.39.16.54.195a.75.75 0 0 0 .285-1.472 4.498 4.498 0 0 0-.79-.176 5.003 5.003 0 0 1-.77-.36 6.016 6.016 0 0 1-1.403-.86l-.16-.096c-.38-.263-.74-.553-1.07-.86-.33-.307-.625-.617-.876-.924-.059-.073-.112-.147-.159-.22ZM13.68 15.21a.75.75 0 0 0 1.223-.804c-.047-.073-.1-.147-.159-.22-.251-.307-.545-.617-.876-.924-.33-.307-.69-.597-1.07-.86l-.16-.096a6.016 6.016 0 0 1-1.403-.86 5.003 5.003 0 0 1-.77-.36c-.209-.096-.39-.16-.54-.195a.75.75 0 0 0-.285 1.472 4.498 4.498 0 0 0 .79.176c.32.175.61.32.86.43.33.15.69.264 1.109.347l.16.096c.38.263.74.553 1.07.86.33.307.625.617.876.924.059.073.112.147.159.22Z" />
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM2.25 12c0 2.789 1.125 5.304 2.933 7.163l1.297-1.297a.75.75 0 0 1 1.06 0c.38.38.38 1.003 0 1.383l-1.44 1.439A9.75 9.75 0 0 0 12 21.75c2.789 0 5.304-1.125 7.163-2.933l-1.297-1.297a.75.75 0 0 1 0-1.06c.38-.38 1.003-.38 1.383 0l1.439 1.44A9.75 9.75 0 0 0 21.75 12c0-2.789-1.125-5.304-2.933-7.163l-1.297 1.297a.75.75 0 0 1-1.06 0c-.38.38-.38-1.003 0-1.383l1.439-1.44A9.75 9.75 0 0 0 12 2.25c-2.789 0-5.304 1.125-7.163 2.933l1.297 1.297a.75.75 0 0 1 0 1.06c-.38.38-.38-1.003 0-1.383l1.44 1.439A9.75 9.75 0 0 0 2.25 12Z" clip-rule="evenodd" />
                         </svg>
-                        SMS வழியாக அனுப்பவும்
+                        Send via SMS
                     </a>
                     <a id="whatsappButton" href="#" class="send-button" target="_blank" rel="noopener noreferrer" disabled>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                             <path d="M12 0C5.373 0 0 5.373 0 12c0 2.067.534 4.02 1.5 5.72l-1.5 4.78 5-1.5c1.693.966 3.646 1.5 5.72 1.5 6.627 0 12-5.373 12-12S18.627 0 12 0zm0 2C17.522 2 22 6.478 22 12c0 5.523-4.478 10-10 10-1.993 0-3.86-.585-5.464-1.6L4 20l1.176-3.764c-1.026-1.604-1.6-3.471-1.6-5.464C3.522 6.478 8 2 12 2zm-2.25 5.5h-.5c-.276 0-.5.224-.5.5v2.5c0 .276.224.5.5.5h.5c.276 0 .5-.224.5-.5v-2.5c0-.276-.224-.5-.5-.5zm4.5 0h-.5c-.276 0-.5.224-.5.5v2.5c0 .276.224.5.5.5h.5c.276 0 .5-.224.5-.5v-2.5c0-.276-.224-.5-.5-.5zM12 11c-2.761 0-5 2.239-5 5s2.239 5 5 5 5-2.239 5-5-2.239-5-5-5zm0 1c2.209 0 4 1.791 4 4s-1.791 4-4 4-4-1.791-4-4 1.791-4 4-4zm-2 2h4v2h-4v-2z"/>
                         </svg>
-                        WhatsApp வழியாக அனுப்பவும்
+                        Send via WhatsApp
                     </a>
                 </div>
             </div>
@@ -525,13 +538,33 @@
         </div>
     </div>
 
-    <script>
-        // Data storage for bills and payments
-        let billDetails = [];
-        let paymentHistory = [];
-        // Global object to store staff details (name and mobile number)
-        // Format: { "StaffName1": { mobile: "1234567890" }, "StaffName2": { mobile: "0987654321" } }
-        let staffDetails = {};
+    <script type="module">
+        // Firebase SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, where, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration (moved outside function for clarity and global access)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3EbcGQBEnThwvTTKxHWVfwLdVWIj4_pc",
+            authDomain: "saaraltrackerapp.firebaseapp.com",
+            projectId: "saaraltrackerapp",
+            storageBucket: "saaraltrackerapp.firebasestorage.app",
+            messagingSenderId: "606630552381",
+            appId: "1:606630552381:web:9d9caebd60a0c903825b54"
+        };
+
+        // Firebase variables
+        let app;
+        let db;
+        let auth;
+        let userId = null;
+        let appId = firebaseConfig.projectId; // Use projectId from the config as appId
+
+        // Data storage in memory (will be synced with Firestore)
+        let staffDetails = {}; // { "StaffName": { mobile: "123", docId: "firestoreDocId" } }
+        let billDetails = []; // [{ staffName: "...", billDate: "...", docId: "firestoreDocId" }]
+        let paymentHistory = []; // [{ staffName: "...", paymentDate: "...", docId: "firestoreDocId" }]
 
         // Variable to store the callback for confirmation dialog
         let confirmationCallback = null;
@@ -565,8 +598,10 @@
             }
         }
 
-        // Function to add a new staff member explicitly
-        function addStaffMember() {
+        // --- Firestore Operations ---
+
+        // Function to add a new staff member to Firestore
+        async function addStaffMember() {
             const newStaffNameInput = document.getElementById('newStaffName');
             const newStaffMobileInput = document.getElementById('newStaffMobile');
             const staffName = newStaffNameInput.value.trim();
@@ -576,39 +611,73 @@
                 showMessage('Please enter a staff name.');
                 return;
             }
-            if (staffDetails[staffName]) { // Check if staff name already exists
-                showMessage(`Staff member "${staffName}" already exists.`);
-                newStaffNameInput.value = ''; // Clear input even if exists
+            if (!userId) {
+                showMessage('Authentication not ready. Please wait.');
                 return;
             }
 
-            staffDetails[staffName] = { mobile: mobileNumber }; // Store name and mobile
-            newStaffNameInput.value = '';
-            newStaffMobileInput.value = '';
-            showMessage(`Staff "${staffName}" added.`);
-            renderTables(); // Update all tables and dropdowns
+            // Check if staff name already exists in memory (which reflects Firestore)
+            if (staffDetails[staffName]) {
+                showMessage(`Staff member "${staffName}" already exists.`);
+                newStaffNameInput.value = '';
+                return;
+            }
+
+            try {
+                const staffRef = doc(db, `artifacts/${appId}/users/${userId}/staff_members`, staffName); // Use staffName as doc ID
+                await setDoc(staffRef, {
+                    name: staffName,
+                    mobile: mobileNumber
+                });
+                newStaffNameInput.value = '';
+                newStaffMobileInput.value = '';
+                showMessage(`Staff "${staffName}" added to Firestore.`);
+                // Data will be updated via onSnapshot listener
+            } catch (e) {
+                console.error("Error adding staff member: ", e);
+                showMessage("Error adding staff member. Please try again.");
+            }
         }
 
-        // Function to delete a staff member
-        function deleteStaffMember(staffNameToDelete) {
+        // Function to delete a staff member from Firestore and related data
+        async function deleteStaffMember(staffNameToDelete) {
             showConfirmation(
                 'Confirm Deletion',
                 `Are you sure you want to delete staff member "${staffNameToDelete}" and all their associated bills and payments? This action cannot be undone.`,
-                (confirmed) => {
+                async (confirmed) => {
                     if (confirmed) {
-                        // Remove from staffDetails object
-                        delete staffDetails[staffNameToDelete];
+                        if (!userId) {
+                            showMessage('Authentication not ready. Please wait.');
+                            return;
+                        }
+                        try {
+                            const batch = writeBatch(db);
 
-                        // Filter out bills associated with this staff member
-                        billDetails = billDetails.filter(bill => bill.staffName !== staffNameToDelete);
+                            // 1. Delete staff member document
+                            const staffDocRef = doc(db, `artifacts/${appId}/users/${userId}/staff_members`, staffNameToDelete);
+                            batch.delete(staffDocRef);
 
-                        // Filter out payments associated with this staff member
-                        paymentHistory = paymentHistory.filter(payment => payment.staffName !== staffNameToDelete);
+                            // 2. Delete associated bills
+                            const billsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/bills`), where("staffName", "==", staffNameToDelete));
+                            const billDocs = await getDocs(billsQuery); // Use getDocs to fetch documents
+                            billDocs.forEach((doc) => {
+                                batch.delete(doc.ref);
+                            });
 
-                        showMessage(`Staff member "${staffNameToDelete}" and all their data deleted successfully.`);
-                        renderTables(); // Re-render all tables and dropdowns
-                        generateReport(); // Re-generate report in case the deleted staff was selected
-                        renderOverallTotals(); // Update overall totals
+                            // 3. Delete associated payments
+                            const paymentsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/payments`), where("staffName", "==", staffNameToDelete));
+                            const paymentDocs = await getDocs(paymentsQuery); // Use getDocs to fetch documents
+                            paymentDocs.forEach((doc) => {
+                                batch.delete(doc.ref);
+                            });
+
+                            await batch.commit();
+                            showMessage(`Staff member "${staffNameToDelete}" and all their data deleted successfully from Firestore.`);
+                            // Data will be updated via onSnapshot listeners
+                        } catch (e) {
+                            console.error("Error deleting staff member and data: ", e);
+                            showMessage("Error deleting staff member and data. Please try again.");
+                        }
                     } else {
                         showMessage(`Deletion of "${staffNameToDelete}" cancelled.`);
                     }
@@ -616,82 +685,98 @@
             );
         }
 
-        // Function to add a new bill
-        function addBill() {
+        // Function to add a new bill to Firestore
+        async function addBill() {
             const staffNameSelect = document.getElementById('billStaffNameSelect');
-            const staffName = staffNameSelect.value; // Get value from select
+            const staffName = staffNameSelect.value;
             const billDate = document.getElementById('billDate').value;
             const billNo = document.getElementById('billNo').value.trim();
             const billAmount = parseFloat(document.getElementById('billAmount').value);
 
-            // Basic validation
             if (!staffName || staffName === "" || !billDate || !billNo || isNaN(billAmount) || billAmount <= 0) {
                 showMessage('Please select a staff member and fill in all bill details correctly.');
                 return;
             }
-
-            billDetails.push({
-                staffName: staffName,
-                billDate: billDate,
-                billNo: billNo,
-                billAmount: billAmount
-            });
-            // If staff was added via bill, ensure they are in staffDetails (with empty mobile if not provided)
-            if (!staffDetails[staffName]) {
-                staffDetails[staffName] = { mobile: '' };
+            if (!userId) {
+                showMessage('Authentication not ready. Please wait.');
+                return;
             }
 
-            // Clear form fields
-            staffNameSelect.value = ''; // Reset dropdown
-            document.getElementById('billDate').value = new Date().toISOString().split('T')[0]; // Reset to today
-            document.getElementById('billNo').value = '';
-            document.getElementById('billAmount').value = '';
+            try {
+                const billsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/bills`);
+                await setDoc(doc(billsCollectionRef), { // Use setDoc with doc() for auto-ID
+                    staffName: staffName,
+                    billDate: billDate,
+                    billNo: billNo,
+                    billAmount: billAmount,
+                    timestamp: new Date() // Add a timestamp for ordering
+                });
+                // If staff was added via bill, ensure they are in staffDetails in Firestore (with empty mobile if not provided)
+                if (!staffDetails[staffName]) {
+                    const staffRef = doc(db, `artifacts/${appId}/users/${userId}/staff_members`, staffName);
+                    await setDoc(staffRef, { name: staffName, mobile: '' }, { merge: true }); // Use merge to avoid overwriting existing mobile
+                }
 
-            showMessage('Bill added successfully!');
-            renderTables(); // Re-render all tables and update dropdowns
-            generateReport(); // Re-generate report to include new data if staff is selected
-            renderOverallTotals(); // Update overall totals
+                staffNameSelect.value = '';
+                document.getElementById('billDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('billNo').value = '';
+                document.getElementById('billAmount').value = '';
+
+                showMessage('Bill added successfully to Firestore!');
+                // Data will be updated via onSnapshot listener
+            } catch (e) {
+                console.error("Error adding bill: ", e);
+                showMessage("Error adding bill. Please try again.");
+            }
         }
 
-        // Function to add a new payment
-        function addPayment() {
+        // Function to add a new payment to Firestore
+        async function addPayment() {
             const staffNameSelect = document.getElementById('paymentStaffNameSelect');
-            const staffName = staffNameSelect.value; // Get value from select
+            const staffName = staffNameSelect.value;
             const paymentDate = document.getElementById('paymentDate').value;
             const amountPaid = parseFloat(document.getElementById('amountPaid').value);
 
-            // Basic validation
             if (!staffName || staffName === "" || !paymentDate || isNaN(amountPaid) || amountPaid <= 0) {
                 showMessage('Please select a staff member and fill in all payment details correctly.');
                 return;
             }
-
-            paymentHistory.push({
-                staffName: staffName,
-                paymentDate: paymentDate,
-                amountPaid: amountPaid
-            });
-            // If staff was added via payment, ensure they are in staffDetails (with empty mobile if not provided)
-            if (!staffDetails[staffName]) {
-                staffDetails[staffName] = { mobile: '' };
+            if (!userId) {
+                showMessage('Authentication not ready. Please wait.');
+                return;
             }
 
-            // Clear form fields
-            staffNameSelect.value = ''; // Reset dropdown
-            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0]; // Reset to today
-            document.getElementById('amountPaid').value = '';
+            try {
+                const paymentsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/payments`);
+                await setDoc(doc(paymentsCollectionRef), { // Use setDoc with doc() for auto-ID
+                    staffName: staffName,
+                    paymentDate: paymentDate,
+                    amountPaid: amountPaid,
+                    timestamp: new Date() // Add a timestamp for ordering
+                });
+                // If staff was added via payment, ensure they are in staffDetails in Firestore (with empty mobile if not provided)
+                if (!staffDetails[staffName]) {
+                    const staffRef = doc(db, `artifacts/${appId}/users/${userId}/staff_members`, staffName);
+                    await setDoc(staffRef, { name: staffName, mobile: '' }, { merge: true }); // Use merge to avoid overwriting existing mobile
+                }
 
-            showMessage('Payment added successfully!');
-            renderTables(); // Re-render all tables and update dropdowns
-            generateReport(); // Re-generate report to include new data if staff is selected
-            renderOverallTotals(); // Update overall totals
+                staffNameSelect.value = '';
+                document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('amountPaid').value = '';
+
+                showMessage('Payment added successfully to Firestore!');
+                // Data will be updated via onSnapshot listener
+            } catch (e) {
+                console.error("Error adding payment: ", e);
+                showMessage("Error adding payment. Please try again.");
+            }
         }
 
-        // Function to render the Bill Details table
+        // --- UI Rendering Functions (mostly unchanged, now driven by Firestore data) ---
+
         function renderBillDetailsTable() {
             const tableBody = document.getElementById('billDetailsTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = ''; // Clear existing rows
-
+            tableBody.innerHTML = '';
             billDetails.forEach(bill => {
                 const row = tableBody.insertRow();
                 row.insertCell().textContent = bill.staffName;
@@ -701,11 +786,9 @@
             });
         }
 
-        // Function to render the Payment History table
         function renderPaymentHistoryTable() {
             const tableBody = document.getElementById('paymentHistoryTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = ''; // Clear existing rows
-
+            tableBody.innerHTML = '';
             paymentHistory.forEach(payment => {
                 const row = tableBody.insertRow();
                 row.insertCell().textContent = payment.staffName;
@@ -714,14 +797,12 @@
             });
         }
 
-        // Function to render the Summary table (Per-Staff Summary)
         function renderSummaryTable() {
             const tableBody = document.getElementById('summaryTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = ''; // Clear existing rows
+            tableBody.innerHTML = '';
 
-            const staffSummary = {}; // Object to hold summary data for each staff
+            const staffSummary = {};
 
-            // Calculate Total Bill for each staff
             billDetails.forEach(bill => {
                 if (!staffSummary[bill.staffName]) {
                     staffSummary[bill.staffName] = { totalBill: 0, totalPaid: 0, totalPending: 0 };
@@ -729,7 +810,6 @@
                 staffSummary[bill.staffName].totalBill += bill.billAmount;
             });
 
-            // Calculate Total Paid for each staff
             paymentHistory.forEach(payment => {
                 if (!staffSummary[payment.staffName]) {
                     staffSummary[payment.staffName] = { totalBill: 0, totalPaid: 0, totalPending: 0 };
@@ -737,13 +817,11 @@
                 staffSummary[payment.staffName].totalPaid += payment.amountPaid;
             });
 
-            // Calculate Total Pending and render rows
-            // Ensure all staff in staffDetails are considered, even if they have 0 bills/payments
             const allStaffNamesArray = Object.keys(staffDetails);
             const allStaffForSummary = new Set([...allStaffNamesArray, ...Object.keys(staffSummary)]);
 
             Array.from(allStaffForSummary).sort().forEach(staffName => {
-                const summary = staffSummary[staffName] || { totalBill: 0, totalPaid: 0 }; // Initialize if staff has no transactions
+                const summary = staffSummary[staffName] || { totalBill: 0, totalPaid: 0 };
                 summary.totalPending = summary.totalBill - summary.totalPaid;
 
                 const row = tableBody.insertRow();
@@ -754,15 +832,14 @@
             });
         }
 
-        // Function to render the Staff List table
         function renderStaffListTable() {
             const tableBody = document.getElementById('staffListTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = ''; // Clear existing rows
+            tableBody.innerHTML = '';
 
             Array.from(Object.keys(staffDetails)).sort().forEach(staffName => {
                 const row = tableBody.insertRow();
                 row.insertCell().textContent = staffName;
-                row.insertCell().textContent = staffDetails[staffName].mobile || 'N/A'; // Display mobile number
+                row.insertCell().textContent = staffDetails[staffName].mobile || 'N/A';
                 const actionsCell = row.insertCell();
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
@@ -772,18 +849,15 @@
             });
         }
 
-        // Function to populate staff dropdowns (for Bill, Payment, and Report)
         function populateStaffDropdowns() {
             const billStaffSelect = document.getElementById('billStaffNameSelect');
             const paymentStaffSelect = document.getElementById('paymentStaffNameSelect');
             const reportStaffSelect = document.getElementById('reportStaffNameSelect');
 
-            // Store current selected values to restore after repopulating
             const currentBillSelected = billStaffSelect.value;
             const currentPaymentSelected = paymentStaffSelect.value;
             const currentReportSelected = reportStaffSelect.value;
 
-            // Clear existing options (except the default "Select Staff")
             billStaffSelect.innerHTML = '<option value="">Select Staff</option>';
             paymentStaffSelect.innerHTML = '<option value="">Select Staff</option>';
             reportStaffSelect.innerHTML = '<option value="">Select Staff</option>';
@@ -807,7 +881,6 @@
                 reportStaffSelect.appendChild(option3);
             });
 
-            // Restore previously selected values if they still exist
             if (staffDetails[currentBillSelected]) {
                 billStaffSelect.value = currentBillSelected;
             }
@@ -819,7 +892,6 @@
             }
         }
 
-        // Function to generate and display the staff report
         function generateReport() {
             const selectedStaff = document.getElementById('reportStaffNameSelect').value;
             const reportBillsTableBody = document.getElementById('reportBillsTable').getElementsByTagName('tbody')[0];
@@ -830,10 +902,10 @@
             const smsButton = document.getElementById('smsButton');
             const whatsappButton = document.getElementById('whatsappButton');
 
-            reportBillsTableBody.innerHTML = ''; // Clear previous report
-            reportPaymentsTableBody.innerHTML = ''; // Clear previous report
-            reportPendingAmountBox.classList.add('hidden'); // Hide pending amount box by default
-            smsButton.setAttribute('disabled', 'true'); // Disable buttons by default
+            reportBillsTableBody.innerHTML = '';
+            reportPaymentsTableBody.innerHTML = '';
+            reportPendingAmountBox.classList.add('hidden');
+            smsButton.setAttribute('disabled', 'true');
             whatsappButton.setAttribute('disabled', 'true');
 
             if (!selectedStaff) {
@@ -843,7 +915,6 @@
                 return;
             }
 
-            // Calculate total bill and total paid for the selected staff
             let totalBillForReport = 0;
             billDetails.filter(bill => bill.staffName === selectedStaff).forEach(bill => {
                 totalBillForReport += bill.billAmount;
@@ -856,9 +927,8 @@
 
             const pendingAmountForReport = totalBillForReport - totalPaidForReport;
             pendingAmountValueSpan.textContent = `₹${pendingAmountForReport.toFixed(2)}`;
-            reportPendingAmountBox.classList.remove('hidden'); // Show the pending amount box
+            reportPendingAmountBox.classList.remove('hidden');
 
-            // Filter bills for the selected staff
             const staffBills = billDetails.filter(bill => bill.staffName === selectedStaff);
             if (staffBills.length > 0) {
                 staffBills.sort((a, b) => new Date(a.billDate) - new Date(b.billDate)).forEach(bill => {
@@ -871,7 +941,6 @@
                 reportBillsTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">No bills found for ${selectedStaff}.</td></tr>`;
             }
 
-            // Filter payments for the selected staff
             const staffPayments = paymentHistory.filter(payment => payment.staffName === selectedStaff);
             if (staffPayments.length > 0) {
                 staffPayments.sort((a, b) => new Date(a.paymentDate) - new Date(b.paymentDate)).forEach(payment => {
@@ -883,16 +952,15 @@
                 reportPaymentsTableBody.innerHTML = `<tr><td colspan="2" class="text-center text-gray-500">No payments found for ${selectedStaff}.</td></tr>`;
             }
 
-            // Prepare message for SMS/WhatsApp in Tamil
             const staffMobile = staffDetails[selectedStaff] ? staffDetails[selectedStaff].mobile : '';
             if (staffMobile) {
-                const reportMessageTamil = `மொத்த பில் தொகை: ₹${totalBillForReport.toFixed(2)}\n` +
-                                           `மொத்தம் செலுத்தப்பட்ட தொகை: ₹${totalPaidForReport.toFixed(2)}\n` +
-                                           `நிலுவையில் உள்ள தொகை: ₹${pendingAmountForReport.toFixed(2)}\n\n` +
-                                           `முழு விவரங்களுக்கு, தயவுசெய்து என்னை தொடர்பு கொள்ளவும்.`;
+                const reportMessageEnglish = `Total Bill Amount: ₹${totalBillForReport.toFixed(2)}\n` +
+                                           `Total Paid Amount: ₹${totalPaidForReport.toFixed(2)}\n` +
+                                           `Pending Balance: ₹${pendingAmountForReport.toFixed(2)}\n\n` +
+                                           `For full details, please contact me.`;
 
-                smsButton.href = `sms:${staffMobile}?body=${encodeURIComponent(reportMessageTamil)}`;
-                whatsappButton.href = `https://wa.me/${staffMobile}?text=${encodeURIComponent(reportMessageTamil)}`;
+                smsButton.href = `sms:${staffMobile}?body=${encodeURIComponent(reportMessageEnglish)}`;
+                whatsappButton.href = `https://wa.me/${staffMobile}?text=${encodeURIComponent(reportMessageEnglish)}`;
                 smsButton.removeAttribute('disabled');
                 whatsappButton.removeAttribute('disabled');
             } else {
@@ -900,7 +968,6 @@
             }
         }
 
-        // Function to render the Overall Totals section
         function renderOverallTotals() {
             let totalBillAmount = 0;
             billDetails.forEach(bill => {
@@ -919,40 +986,165 @@
             document.getElementById('overallTotalPending').textContent = `₹${overallPending.toFixed(2)}`;
         }
 
-        // Function to render all tables and update dropdowns
         function renderTables() {
             renderBillDetailsTable();
             renderPaymentHistoryTable();
             renderSummaryTable();
-            renderStaffListTable(); // Render the new staff list table
-            populateStaffDropdowns(); // Ensure dropdowns are always fresh
-            renderOverallTotals(); // Render overall totals
+            renderStaffListTable();
+            populateStaffDropdowns();
+            renderOverallTotals();
         }
 
-        // Function to switch between tabs
         function showTab(tabId) {
-            // Hide all tab contents
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.add('hidden');
             });
-
-            // Show the selected tab content
             document.getElementById(tabId).classList.remove('hidden');
-
-            // Set the selected value in the main dropdown
             const mainTabSelect = document.getElementById('mainTabSelect');
             if (mainTabSelect) {
                 mainTabSelect.value = tabId;
             }
 
-            // If the report tab is shown, generate the report immediately
             if (tabId === 'reportTab') {
                 generateReport();
             }
-            // If the overall totals tab is shown, render its content
             if (tabId === 'overallTotalsTab') {
                 renderOverallTotals();
             }
+        }
+
+        // --- Firebase Initialization and Data Loading ---
+
+        async function initializeFirebaseAndLoadData() {
+            console.log("Initializing Firebase and loading data...");
+            try {
+                // Firebase Configuration: Directly use the provided config
+                const firebaseConfig = {
+                    apiKey: "AIzaSyA3EbcGQBEnThwvTTKxHWVfwLdVWIj4_pc",
+                    authDomain: "saaraltrackerapp.firebaseapp.com",
+                    projectId: "saaraltrackerapp",
+                    storageBucket: "saaraltrackerapp.firebasestorage.app",
+                    messagingSenderId: "606630552381",
+                    appId: "1:606630552381:web:9d9caebd60a0c903825b54"
+                };
+                console.log("Firebase Config:", firebaseConfig);
+
+                // Check if firebaseConfig is valid before proceeding
+                if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId) {
+                    console.error("Firebase config is incomplete or invalid. Cannot initialize Firebase.");
+                    showMessage("App configuration missing or invalid. Please contact support.");
+                    document.getElementById('loadingOverlay').textContent = "Error: Invalid Config.";
+                    return;
+                }
+
+                // Initialize Firebase app directly here
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app); // Get auth instance from the initialized app
+                db = getFirestore(app); // Get firestore instance from the initialized app
+                console.log("Firebase app, auth, and db initialized.");
+
+                // Authenticate user anonymously
+                console.log("Attempting authentication...");
+                try {
+                    console.log("Signing in anonymously...");
+                    await signInAnonymously(auth);
+                    console.log("Anonymous sign-in attempted.");
+                } catch (authError) {
+                    console.error("Authentication failed: ", authError);
+                    showMessage(`Authentication failed. Data will not persist. Error: ${authError.message}`);
+                    document.getElementById('loadingOverlay').textContent = "Authentication Failed.";
+                    return; // Stop execution if authentication fails
+                }
+
+                // Listen for auth state changes to get userId
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Authenticated with userId:", userId);
+                        // Once authenticated, start listening to Firestore collections
+                        setupFirestoreListeners();
+                        document.getElementById('loadingOverlay').classList.add('hidden');
+                        document.getElementById('mainContent').classList.remove('hidden');
+                        showTab('billDetailsTab'); // Show default tab after loading
+                        console.log("App loaded and default tab shown.");
+                    } else {
+                        userId = null;
+                        console.log("No user is signed in. Data will not persist.");
+                        showMessage("Not authenticated. Data will not persist.");
+                        document.getElementById('loadingOverlay').textContent = "Authentication Failed.";
+                    }
+                });
+
+            } catch (e) {
+                console.error("Error during Firebase initialization or authentication setup: ", e);
+                showMessage("Failed to initialize app. Please check console for errors.");
+                document.getElementById('loadingOverlay').textContent = "Error during startup.";
+            }
+        }
+
+        function setupFirestoreListeners() {
+            if (!db || !userId) {
+                console.error("Firestore or userId not available for listeners. Cannot set up listeners.");
+                showMessage("Database not ready. Data sync disabled.");
+                return;
+            }
+            console.log("Setting up Firestore listeners for userId:", userId);
+
+            // Listener for Staff Members
+            onSnapshot(collection(db, `artifacts/${appId}/users/${userId}/staff_members`), (snapshot) => {
+                console.log("Staff members snapshot received.");
+                staffDetails = {}; // Clear existing staff details
+                snapshot.forEach((doc) => {
+                    staffDetails[doc.id] = { ...doc.data(), docId: doc.id }; // doc.id is the staff name
+                });
+                console.log("Staff details updated:", staffDetails);
+                renderTables(); // Re-render all tables
+            }, (error) => {
+                console.error("Error listening to staff_members: ", error);
+                showMessage("Error loading staff data.");
+            });
+
+            // Listener for Bills
+            onSnapshot(collection(db, `artifacts/${appId}/users/${userId}/bills`), (snapshot) => {
+                console.log("Bills snapshot received.");
+                billDetails = []; // Clear existing bills
+                snapshot.forEach((doc) => {
+                    billDetails.push({ ...doc.data(), docId: doc.id });
+                });
+                // Sort bills by date (and then timestamp if dates are same)
+                billDetails.sort((a, b) => {
+                    const dateA = new Date(a.billDate);
+                    const dateB = new Date(b.billDate);
+                    if (dateA - dateB !== 0) return dateA - dateB;
+                    return (a.timestamp && b.timestamp) ? a.timestamp.toDate() - b.timestamp.toDate() : 0;
+                });
+                console.log("Bill details updated:", billDetails);
+                renderTables(); // Re-render all tables
+            }, (error) => {
+                console.error("Error listening to bills: ", error);
+                showMessage("Error loading bill data.");
+            });
+
+            // Listener for Payments
+            onSnapshot(collection(db, `artifacts/${appId}/users/${userId}/payments`), (snapshot) => {
+                console.log("Payments snapshot received.");
+                paymentHistory = []; // Clear existing payments
+                snapshot.forEach((doc) => {
+                    paymentHistory.push({ ...doc.data(), docId: doc.id });
+                });
+                // Sort payments by date (and then timestamp if dates are same)
+                paymentHistory.sort((a, b) => {
+                    const dateA = new Date(a.paymentDate);
+                    const dateB = new Date(b.paymentDate);
+                    if (dateA - dateB !== 0) return dateA - dateB;
+                    return (a.timestamp && b.timestamp) ? a.timestamp.toDate() - b.timestamp.toDate() : 0;
+                });
+                console.log("Payment history updated:", paymentHistory);
+                renderTables(); // Re-render all tables
+            }, (error) => {
+                console.error("Error listening to payments: ", error);
+                showMessage("Error loading payment data.");
+            });
         }
 
         // Initial setup when the page loads
@@ -962,39 +1154,8 @@
             document.getElementById('billDate').value = today;
             document.getElementById('paymentDate').value = today;
 
-            // Add some initial sample data
-            // Note: Now staffDetails object holds the mobile number
-            staffDetails['Priya'] = { mobile: '9876543210' };
-            staffDetails['Rahul'] = { mobile: '9988776655' };
-            staffDetails['Amit'] = { mobile: '' }; // Amit has no mobile number initially
-
-            billDetails.push(
-                { staffName: 'Priya', billDate: '2025-07-01', billNo: 'D001', billAmount: 1500 },
-                { staffName: 'Rahul', billDate: '2025-07-05', billNo: 'D002', billAmount: 2000 },
-                { staffName: 'Priya', billDate: '2025-07-10', billNo: 'D003', billAmount: 1200 },
-                { staffName: 'Amit', billDate: '2025-07-12', billNo: 'D004', billAmount: 800 }
-            );
-
-            paymentHistory.push(
-                { staffName: 'Priya', paymentDate: '2025-07-15', amountPaid: 1000 },
-                { staffName: 'Rahul', paymentDate: '2025-07-20', amountPaid: 2000 },
-                { staffName: 'Priya', paymentDate: '2025-07-25', amountPaid: 500 }
-            );
-
-            // Ensure staffDetails is populated from any existing bill/payment data
-            billDetails.forEach(bill => {
-                if (!staffDetails[bill.staffName]) {
-                    staffDetails[bill.staffName] = { mobile: '' };
-                }
-            });
-            paymentHistory.forEach(payment => {
-                if (!staffDetails[payment.staffName]) {
-                    staffDetails[payment.staffName] = { mobile: '' };
-                }
-            });
-
-            renderTables(); // Render tables with initial data and populate dropdowns
-            showTab('billDetailsTab'); // Show Bill Details tab by default
+            // Initialize Firebase and load data
+            initializeFirebaseAndLoadData();
         };
     </script>
 </body>
