@@ -591,8 +591,9 @@
         let app;
         let db;
         let auth;
-        let userId = null; // Will be set after authentication
-        let appId = firebaseConfig.projectId; // Use projectId from the config as appId
+        // userId and appId are now global via window object
+        window.userId = null; 
+        window.appId = firebaseConfig.projectId; // Use projectId from the config as appId
 
         // Data storage in memory (will be synced with Firestore)
         let staffDetails = {};
@@ -644,7 +645,7 @@
                 showMessage('Please enter a staff name.');
                 return;
             }
-            if (!userId) {
+            if (!window.userId) { // Use window.userId
                 showMessage('Authentication not ready. Please wait.');
                 return;
             }
@@ -657,7 +658,7 @@
             }
 
             try {
-                const staffRef = doc(db, `artifacts/${appId}/users/${userId}/staff_members`, staffName); // Use staffName as doc ID
+                const staffRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffName); // Use window.appId, window.userId
                 await setDoc(staffRef, {
                     name: staffName,
                     mobile: mobileNumber
@@ -679,7 +680,7 @@
                 `Are you sure you want to delete staff member "${staffNameToDelete}" and all their associated bills and payments? This action cannot be undone.`,
                 async (confirmed) => {
                     if (confirmed) {
-                        if (!userId) {
+                        if (!window.userId) { // Use window.userId
                             showMessage('Authentication not ready. Please wait.');
                             return;
                         }
@@ -687,18 +688,18 @@
                             const batch = writeBatch(db);
 
                             // 1. Delete staff member document
-                            const staffDocRef = doc(db, `artifacts/${appId}/users/${userId}/staff_members`, staffNameToDelete);
+                            const staffDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffNameToDelete); // Use window.appId, window.userId
                             batch.delete(staffDocRef);
 
                             // 2. Delete associated bills
-                            const billsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/bills`), where("staffName", "==", staffNameToDelete));
+                            const billsQuery = query(collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`), where("staffName", "==", staffNameToDelete)); // Use window.appId, window.userId
                             const billDocs = await getDocs(billsQuery); // Use getDocs to fetch documents
                             billDocs.forEach((doc) => {
                                 batch.delete(doc.ref);
                             });
 
                             // 3. Delete associated payments
-                            const paymentsQuery = query(collection(db, `artifacts/${appId}/users/${userId}/payments`), where("staffName", "==", staffNameToDelete));
+                            const paymentsQuery = query(collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`), where("staffName", "==", staffNameToDelete)); // Use window.appId, window.userId
                             const paymentDocs = await getDocs(paymentsQuery); // Use getDocs to fetch documents
                             paymentDocs.forEach((doc) => {
                                 batch.delete(doc.ref);
@@ -730,13 +731,13 @@
                 showMessage('Please select a staff member and fill in all bill details correctly.');
                 return;
             }
-            if (!userId) {
+            if (!window.userId) { // Use window.userId
                 showMessage('Authentication not ready. Please wait.');
                 return;
             }
 
             try {
-                const billsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/bills`);
+                const billsCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`); // Use window.appId, window.userId
                 await setDoc(doc(billsCollectionRef), { // Use setDoc with doc() for auto-ID
                     staffName: staffName,
                     billDate: billDate,
@@ -746,7 +747,7 @@
                 });
                 // If staff was added via bill, ensure they are in staffDetails in Firestore (with empty mobile if not provided)
                 if (!staffDetails[staffName]) {
-                    const staffRef = doc(db, `artifacts/${appId}/users/${userId}/staff_members`, staffName);
+                    const staffRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffName); // Use window.appId, window.userId
                     await setDoc(staffRef, { name: staffName, mobile: '' }, { merge: true }); // Use merge to avoid overwriting existing mobile
                 }
 
@@ -774,13 +775,13 @@
                 showMessage('Please select a staff member and fill in all payment details correctly.');
                 return;
             }
-            if (!userId) {
+            if (!window.userId) { // Use window.userId
                 showMessage('Authentication not ready. Please wait.');
                 return;
             }
 
             try {
-                const paymentsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/payments`);
+                const paymentsCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`); // Use window.appId, window.userId
                 await setDoc(doc(paymentsCollectionRef), { // Use setDoc with doc() for auto-ID
                     staffName: staffName,
                     paymentDate: paymentDate,
@@ -789,7 +790,7 @@
                 });
                 // If staff was added via payment, ensure they are in staffDetails in Firestore (with empty mobile if not provided)
                 if (!staffDetails[staffName]) {
-                    const staffRef = doc(db, `artifacts/${appId}/users/${userId}/staff_members`, staffName);
+                    const staffRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffName); // Use window.appId, window.userId
                     await setDoc(staffRef, { name: staffName, mobile: '' }, { merge: true }); // Use merge to avoid overwriting existing mobile
                 }
 
@@ -1030,7 +1031,7 @@
             // Update userId display
             const userIdDisplay = document.getElementById('userIdDisplay');
             if (userIdDisplay) {
-                userIdDisplay.textContent = `User ID: ${userId || 'Not authenticated'}`;
+                userIdDisplay.textContent = `User ID: ${window.userId || 'Not authenticated'}`; // Use window.userId
             }
         }
 
@@ -1132,8 +1133,8 @@
                 onAuthStateChanged(auth, (user) => {
                     clearTimeout(loadingTimeout); // Clear timeout once auth state is known
                     if (user) {
-                        userId = user.uid; // Correctly set userId from authenticated user
-                        console.log("Authenticated with userId:", userId);
+                        window.userId = user.uid; // Correctly set userId from authenticated user and make it global
+                        console.log("Authenticated with userId:", window.userId);
                         // Once authenticated, start listening to Firestore collections
                         setupFirestoreListeners(); // This triggers data loading and rendering
                         // The overlay will be hidden and main content shown after initial data is rendered
@@ -1145,7 +1146,7 @@
                         mainContent.classList.remove('hidden'); // Ensure main content is visible
                         showTab('billDetailsTab'); // Show default tab after loading
                     } else {
-                        userId = null;
+                        window.userId = null; // Use window.userId
                         console.log("No user is signed in. Data will not persist.");
                         showMessage("Not authenticated. Data will not persist.");
                         loadingOverlay.textContent = "Authentication Failed.";
@@ -1163,15 +1164,15 @@
         }
 
         function setupFirestoreListeners() {
-            if (!db || !userId) {
+            if (!db || !window.userId) { // Use window.userId
                 console.error("Firestore or userId not available for listeners. Cannot set up listeners.");
                 showMessage("Database not ready. Data sync disabled.");
                 return;
             }
-            console.log("Setting up Firestore listeners for userId:", userId);
+            console.log("Setting up Firestore listeners for userId:", window.userId); // Use window.userId
 
             // Listener for Staff Members
-            onSnapshot(collection(db, `artifacts/${appId}/users/${userId}/staff_members`), (snapshot) => {
+            onSnapshot(collection(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`), (snapshot) => { // Use window.appId, window.userId
                 console.log("Staff members snapshot received.");
                 staffDetails = {}; // Clear existing staff details
                 snapshot.forEach((doc) => {
@@ -1189,7 +1190,7 @@
             });
 
             // Listener for Bills
-            onSnapshot(collection(db, `artifacts/${appId}/users/${userId}/bills`), (snapshot) => {
+            onSnapshot(collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`), (snapshot) => { // Use window.appId, window.userId
                 console.log("Bills snapshot received.");
                 billDetails = []; // Clear existing bills
                 snapshot.forEach((doc) => {
@@ -1213,7 +1214,7 @@
             });
 
             // Listener for Payments
-            onSnapshot(collection(db, `artifacts/${appId}/users/${userId}/payments`), (snapshot) => {
+            onSnapshot(collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`), (snapshot) => { // Use window.appId, window.userId
                 console.log("Payments snapshot received.");
                 paymentHistory = []; // Clear existing payments
                 snapshot.forEach((doc) => {
