@@ -435,7 +435,7 @@
 
         <!-- Summary Tab Content (Per-Staff Summary) -->
         <div id="summaryTab" class="tab-content hidden">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Per-Staff Summary</h2>
+            <h2 class="2xl font-semibold text-gray-700 mb-4">Per-Staff Summary</h2>
             <div class="table-container">
                 <table id="summaryTable" class="min-w-full bg-white rounded-lg shadow-sm">
                     <thead>
@@ -575,7 +575,7 @@
         // Firebase SDK imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, where, writeBatch, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, where, writeBatch, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Configuration (moved outside function for clarity and global access)
         const firebaseConfig = {
@@ -592,11 +592,12 @@
         let db;
         let auth;
         // userId and appId are now global via window object
-        window.userId = null; 
+        window.userId = "my-saaral-tracker-admin"; // HARDCODED USER ID
         window.appId = firebaseConfig.projectId; // Use projectId from the config as appId
 
         // Data storage in memory (will be synced with Firestore)
-        let staffDetails = {};
+        // Changed staffDetails to an array to support multiple staff with same name
+        let staffDetails = []; // Now an array of { id, name, mobile }
         let billDetails = [];
         let paymentHistory = [];
 
@@ -645,23 +646,31 @@
                 showMessage('Please enter a staff name.');
                 return;
             }
+            if (!mobileNumber) {
+                showMessage('Please enter a mobile number.');
+                return;
+            }
             if (!window.userId) { // Use window.userId
                 showMessage('Authentication not ready. Please wait.');
                 return;
             }
 
-            // Check if staff name already exists in memory (which reflects Firestore)
-            if (staffDetails[staffName]) {
-                showMessage(`Staff member "${staffName}" already exists.`);
+            // Check if staff with this mobile number already exists
+            const existingStaff = staffDetails.find(s => s.mobile === mobileNumber);
+            if (existingStaff) {
+                showMessage(`Staff member with mobile number "${mobileNumber}" already exists.`);
                 newStaffNameInput.value = '';
+                newStaffMobileInput.value = '';
                 return;
             }
 
             try {
-                const staffRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffName); // Use window.appId, window.userId
-                await setDoc(staffRef, {
+                // Use addDoc to let Firestore generate a unique ID for the staff member
+                const staffCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`);
+                await addDoc(staffCollectionRef, {
                     name: staffName,
-                    mobile: mobileNumber
+                    mobile: mobileNumber,
+                    timestamp: new Date() // Add timestamp for sorting
                 });
                 newStaffNameInput.value = '';
                 newStaffMobileInput.value = '';
@@ -674,13 +683,19 @@
         }
 
         // Function to delete a staff member from Firestore and related data
-        window.deleteStaffMember = async function(staffNameToDelete) { // Made global
+        window.deleteStaffMember = async function(staffIdToDelete) { // Now accepts staffId
+            const staffMember = staffDetails.find(s => s.docId === staffIdToDelete);
+            if (!staffMember) {
+                showMessage('Staff member not found.');
+                return;
+            }
+
             showConfirmation(
                 'Confirm Deletion',
-                `Are you sure you want to delete staff member "${staffNameToDelete}" and all their associated bills and payments? This action cannot be undone.`,
+                `Are you sure you want to delete staff member "${staffMember.name} (${staffMember.mobile})" and all their associated bills and payments? This action cannot be undone.`,
                 async (confirmed) => {
                     if (confirmed) {
-                        if (!window.userId) { // Use window.userId
+                        if (!window.userId) {
                             showMessage('Authentication not ready. Please wait.');
                             return;
                         }
@@ -688,32 +703,34 @@
                             const batch = writeBatch(db);
 
                             // 1. Delete staff member document
-                            const staffDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffNameToDelete); // Use window.appId, window.userId
+                            const staffDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffIdToDelete);
                             batch.delete(staffDocRef);
 
                             // 2. Delete associated bills
-                            const billsQuery = query(collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`), where("staffName", "==", staffNameToDelete)); // Use window.appId, window.userId
-                            const billDocs = await getDocs(billsQuery); // Use getDocs to fetch documents
+                            // Query by staffId, not staffName, for accuracy
+                            const billsQuery = query(collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`), where("staffId", "==", staffIdToDelete));
+                            const billDocs = await getDocs(billsQuery);
                             billDocs.forEach((doc) => {
                                 batch.delete(doc.ref);
                             });
 
                             // 3. Delete associated payments
-                            const paymentsQuery = query(collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`), where("staffName", "==", staffNameToDelete)); // Use window.appId, window.userId
-                            const paymentDocs = await getDocs(paymentsQuery); // Use getDocs to fetch documents
+                            // Query by staffId, not staffName, for accuracy
+                            const paymentsQuery = query(collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`), where("staffId", "==", staffIdToDelete));
+                            const paymentDocs = await getDocs(paymentsQuery);
                             paymentDocs.forEach((doc) => {
                                 batch.delete(doc.ref);
                             });
 
                             await batch.commit();
-                            showMessage(`Staff member "${staffNameToDelete}" and all their data deleted successfully from Firestore.`);
+                            showMessage(`Staff member "${staffMember.name}" and all their data deleted successfully from Firestore.`);
                             // Data will be updated via onSnapshot listeners
                         } catch (e) {
                             console.error("Error deleting staff member and data: ", e);
                             showMessage("Error deleting staff member and data. Please try again.");
                         }
                     } else {
-                        showMessage(`Deletion of "${staffNameToDelete}" cancelled.`);
+                        showMessage(`Deletion of "${staffMember.name}" cancelled.`);
                     }
                 }
             );
@@ -721,43 +738,46 @@
 
         // Function to add a new bill to Firestore
         window.addBill = async function() { // Made global
-            const staffNameSelect = document.getElementById('billStaffNameSelect');
-            const staffName = staffNameSelect.value;
+            const billStaffSelect = document.getElementById('billStaffNameSelect');
+            const selectedStaffId = billStaffSelect.value; // Get the staffId from the dropdown
             const billDate = document.getElementById('billDate').value;
             const billNo = document.getElementById('billNo').value.trim();
             const billAmount = parseFloat(document.getElementById('billAmount').value);
 
-            if (!staffName || staffName === "" || !billDate || !billNo || isNaN(billAmount) || billAmount <= 0) {
+            if (!selectedStaffId || selectedStaffId === "" || !billDate || !billNo || isNaN(billAmount) || billAmount <= 0) {
                 showMessage('Please select a staff member and fill in all bill details correctly.');
                 return;
             }
-            if (!window.userId) { // Use window.userId
+            if (!window.userId) {
                 showMessage('Authentication not ready. Please wait.');
                 return;
             }
 
+            // Find the full staff details using the selectedStaffId
+            const staff = staffDetails.find(s => s.docId === selectedStaffId);
+            if (!staff) {
+                showMessage('Selected staff member not found. Please re-select.');
+                return;
+            }
+
             try {
-                const billsCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`); // Use window.appId, window.userId
-                await setDoc(doc(billsCollectionRef), { // Use setDoc with doc() for auto-ID
-                    staffName: staffName,
+                const billsCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`);
+                await addDoc(billsCollectionRef, { // Use addDoc for auto-ID
+                    staffId: staff.docId, // Store unique staff ID
+                    staffName: staff.name, // Store name for display/redundancy
+                    staffMobile: staff.mobile, // Store mobile for display/redundancy
                     billDate: billDate,
                     billNo: billNo,
                     billAmount: billAmount,
-                    timestamp: new Date() // Add a timestamp for ordering
+                    timestamp: new Date()
                 });
-                // If staff was added via bill, ensure they are in staffDetails in Firestore (with empty mobile if not provided)
-                if (!staffDetails[staffName]) {
-                    const staffRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffName); // Use window.appId, window.userId
-                    await setDoc(staffRef, { name: staffName, mobile: '' }, { merge: true }); // Use merge to avoid overwriting existing mobile
-                }
 
-                staffNameSelect.value = '';
+                billStaffSelect.value = '';
                 document.getElementById('billDate').value = new Date().toISOString().split('T')[0];
                 document.getElementById('billNo').value = '';
                 document.getElementById('billAmount').value = '';
 
                 showMessage('Bill added successfully to Firestore!');
-                // Data will be updated via onSnapshot listener
             } catch (e) {
                 console.error("Error adding bill: ", e);
                 showMessage("Error adding bill. Please try again.");
@@ -766,40 +786,43 @@
 
         // Function to add a new payment to Firestore
         window.addPayment = async function() { // Made global
-            const staffNameSelect = document.getElementById('paymentStaffNameSelect');
-            const staffName = staffNameSelect.value;
+            const paymentStaffSelect = document.getElementById('paymentStaffNameSelect');
+            const selectedStaffId = paymentStaffSelect.value; // Get staffId from dropdown
             const paymentDate = document.getElementById('paymentDate').value;
             const amountPaid = parseFloat(document.getElementById('amountPaid').value);
 
-            if (!staffName || staffName === "" || !paymentDate || isNaN(amountPaid) || amountPaid <= 0) {
+            if (!selectedStaffId || selectedStaffId === "" || !paymentDate || isNaN(amountPaid) || amountPaid <= 0) {
                 showMessage('Please select a staff member and fill in all payment details correctly.');
                 return;
             }
-            if (!window.userId) { // Use window.userId
+            if (!window.userId) {
                 showMessage('Authentication not ready. Please wait.');
                 return;
             }
 
+            // Find the full staff details using the selectedStaffId
+            const staff = staffDetails.find(s => s.docId === selectedStaffId);
+            if (!staff) {
+                showMessage('Selected staff member not found. Please re-select.');
+                return;
+            }
+
             try {
-                const paymentsCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`); // Use window.appId, window.userId
-                await setDoc(doc(paymentsCollectionRef), { // Use setDoc with doc() for auto-ID
-                    staffName: staffName,
+                const paymentsCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`);
+                await addDoc(paymentsCollectionRef, { // Use addDoc for auto-ID
+                    staffId: staff.docId, // Store unique staff ID
+                    staffName: staff.name, // Store name for display/redundancy
+                    staffMobile: staff.mobile, // Store mobile for display/redundancy
                     paymentDate: paymentDate,
                     amountPaid: amountPaid,
-                    timestamp: new Date() // Add a timestamp for ordering
+                    timestamp: new Date()
                 });
-                // If staff was added via payment, ensure they are in staffDetails in Firestore (with empty mobile if not provided)
-                if (!staffDetails[staffName]) {
-                    const staffRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffName); // Use window.appId, window.userId
-                    await setDoc(staffRef, { name: staffName, mobile: '' }, { merge: true }); // Use merge to avoid overwriting existing mobile
-                }
 
-                staffNameSelect.value = '';
+                paymentStaffSelect.value = '';
                 document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
                 document.getElementById('amountPaid').value = '';
 
                 showMessage('Payment added successfully to Firestore!');
-                // Data will be updated via onSnapshot listener
             } catch (e) {
                 console.error("Error adding payment: ", e);
                 showMessage("Error adding payment. Please try again.");
@@ -813,7 +836,7 @@
             tableBody.innerHTML = '';
             billDetails.forEach(bill => {
                 const row = tableBody.insertRow();
-                row.insertCell().textContent = bill.staffName;
+                row.insertCell().textContent = bill.staffName; // Display staffName
                 row.insertCell().textContent = bill.billDate;
                 row.insertCell().textContent = bill.billNo;
                 row.insertCell().textContent = bill.billAmount.toFixed(2);
@@ -825,7 +848,7 @@
             tableBody.innerHTML = '';
             paymentHistory.forEach(payment => {
                 const row = tableBody.insertRow();
-                row.insertCell().textContent = payment.staffName;
+                row.insertCell().textContent = payment.staffName; // Display staffName
                 row.insertCell().textContent = payment.paymentDate;
                 row.insertCell().textContent = payment.amountPaid.toFixed(2);
             });
@@ -835,31 +858,38 @@
             const tableBody = document.getElementById('summaryTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
 
-            const staffSummary = {};
+            const staffSummary = {}; // Object to hold summary data for each staff, keyed by staffId
+
+            // Initialize summary for all known staff
+            staffDetails.forEach(staff => {
+                staffSummary[staff.docId] = {
+                    name: staff.name,
+                    mobile: staff.mobile,
+                    totalBill: 0,
+                    totalPaid: 0,
+                    totalPending: 0
+                };
+            });
 
             billDetails.forEach(bill => {
-                if (!staffSummary[bill.staffName]) {
-                    staffSummary[bill.staffName] = { totalBill: 0, totalPaid: 0, totalPending: 0 };
+                if (staffSummary[bill.staffId]) { // Ensure staff exists in summary
+                    staffSummary[bill.staffId].totalBill += bill.billAmount;
                 }
-                staffSummary[bill.staffName].totalBill += bill.billAmount;
             });
 
             paymentHistory.forEach(payment => {
-                if (!staffSummary[payment.staffName]) {
-                    staffSummary[payment.staffName] = { totalBill: 0, totalPaid: 0, totalPending: 0 };
+                if (staffSummary[payment.staffId]) { // Ensure staff exists in summary
+                    staffSummary[payment.staffId].totalPaid += payment.amountPaid;
                 }
-                staffSummary[payment.staffName].totalPaid += payment.amountPaid;
             });
 
-            const allStaffNamesArray = Object.keys(staffDetails);
-            const allStaffForSummary = new Set([...allStaffNamesArray, ...Object.keys(staffSummary)]);
-
-            Array.from(allStaffForSummary).sort().forEach(staffName => {
-                const summary = staffSummary[staffName] || { totalBill: 0, totalPaid: 0 };
+            // Iterate over sorted staffDetails to ensure all staff are displayed
+            Array.from(staffDetails).sort((a, b) => a.name.localeCompare(b.name)).forEach(staff => {
+                const summary = staffSummary[staff.docId];
                 summary.totalPending = summary.totalBill - summary.totalPaid;
 
                 const row = tableBody.insertRow();
-                row.insertCell().textContent = staffName;
+                row.insertCell().textContent = `${summary.name}`; // Display ONLY name
                 row.insertCell().textContent = summary.totalBill.toFixed(2);
                 row.insertCell().textContent = summary.totalPaid.toFixed(2);
                 row.insertCell().textContent = summary.totalPending.toFixed(2);
@@ -870,15 +900,16 @@
             const tableBody = document.getElementById('staffListTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
 
-            Array.from(Object.keys(staffDetails)).sort().forEach(staffName => {
+            // Sort staff by name for display
+            Array.from(staffDetails).sort((a, b) => a.name.localeCompare(b.name)).forEach(staff => {
                 const row = tableBody.insertRow();
-                row.insertCell().textContent = staffName;
-                row.insertCell().textContent = staffDetails[staffName].mobile || 'N/A';
+                row.insertCell().textContent = staff.name;
+                row.insertCell().textContent = staff.mobile || 'N/A'; // Display mobile number
                 const actionsCell = row.insertCell();
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
                 deleteButton.classList.add('delete-button');
-                deleteButton.onclick = () => deleteStaffMember(staffName);
+                deleteButton.onclick = () => deleteStaffMember(staff.docId); // Pass docId for deletion
                 actionsCell.appendChild(deleteButton);
             });
         }
@@ -888,59 +919,65 @@
             const paymentStaffSelect = document.getElementById('paymentStaffNameSelect');
             const reportStaffSelect = document.getElementById('reportStaffNameSelect');
 
+            // Store current selected values (docId) to restore after repopulating
             const currentBillSelected = billStaffSelect.value;
             const currentPaymentSelected = paymentStaffSelect.value;
             const currentReportSelected = reportStaffSelect.value;
 
+            // Clear existing options (except the default "Select Staff")
             billStaffSelect.innerHTML = '<option value="">Select Staff</option>';
             paymentStaffSelect.innerHTML = '<option value="">Select Staff</option>';
             reportStaffSelect.innerHTML = '<option value="">Select Staff</option>';
 
-            const sortedStaff = Array.from(Object.keys(staffDetails)).sort();
+            const sortedStaff = Array.from(staffDetails).sort((a, b) => a.name.localeCompare(b.name));
 
-            sortedStaff.forEach(name => {
+            sortedStaff.forEach(staff => {
+                // Display only name in dropdowns for Bill Details and Payment History
+                const optionTextBasic = staff.name; 
+                // Display only name in dropdown for Report section
+                const optionTextReport = staff.name; // Changed to display ONLY name
+                
                 const option1 = document.createElement('option');
-                option1.value = name;
-                option1.textContent = name;
+                option1.value = staff.docId; // Use docId as the value
+                option1.textContent = optionTextBasic; // Only name
                 billStaffSelect.appendChild(option1);
 
                 const option2 = document.createElement('option');
-                option2.value = name;
-                option2.textContent = name;
+                option2.value = staff.docId; // Use docId as the value
+                option2.textContent = optionTextBasic; // Only name
                 paymentStaffSelect.appendChild(option2);
 
                 const option3 = document.createElement('option');
-                option3.value = name;
-                option3.textContent = name;
+                option3.value = staff.docId; // Use docId as the value
+                option3.textContent = optionTextReport; // Only name
                 reportStaffSelect.appendChild(option3);
             });
 
             // Restore previously selected values if they still exist
-            if (staffDetails[currentBillSelected]) {
+            if (staffDetails.some(s => s.docId === currentBillSelected)) {
                 billStaffSelect.value = currentBillSelected;
             }
-            if (staffDetails[currentPaymentSelected]) {
+            if (staffDetails.some(s => s.docId === currentPaymentSelected)) {
                 paymentStaffSelect.value = currentPaymentSelected;
             }
-            if (staffDetails[currentReportSelected]) {
+            if (staffDetails.some(s => s.docId === currentReportSelected)) {
                 reportStaffSelect.value = currentReportSelected;
             }
         }
 
         window.generateReport = function() { // Made global
-            const selectedStaff = document.getElementById('reportStaffNameSelect').value;
+            const selectedStaffId = document.getElementById('reportStaffNameSelect').value; // Get staffId
             const reportBillsTableBody = document.getElementById('reportBillsTable').getElementsByTagName('tbody')[0];
             const reportPaymentsTableBody = document.getElementById('reportPaymentsTable').getElementsByTagName('tbody')[0];
-            const reportTotalBillValueSpan = document.getElementById('reportTotalBillValue'); // New span for total bill
-            const reportTotalPaidValueSpan = document.getElementById('reportTotalPaidValue'); // New span for total paid
-            const pendingAmountValueSpan = document.getElementById('pendingAmountValue'); // Existing span for pending
+            const reportTotalBillValueSpan = document.getElementById('reportTotalBillValue');
+            const reportTotalPaidValueSpan = document.getElementById('reportTotalPaidValue');
+            const pendingAmountValueSpan = document.getElementById('pendingAmountValue');
 
             const smsButton = document.getElementById('smsButton');
             const whatsappButton = document.getElementById('whatsappButton');
 
             reportBillsTableBody.innerHTML = '';
             reportPaymentsTableBody.innerHTML = '';
-            // Hide all report summary items by default
             reportTotalBillValueSpan.textContent = '₹0.00';
             reportTotalPaidValueSpan.textContent = '₹0.00';
             pendingAmountValueSpan.textContent = '₹0.00';
@@ -948,31 +985,35 @@
             smsButton.setAttribute('disabled', 'true');
             whatsappButton.setAttribute('disabled', 'true');
 
-            if (!selectedStaff) {
+            if (!selectedStaffId) {
                 reportBillsTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500">Select a staff member to view bills.</td></tr>';
                 reportPaymentsTableBody.innerHTML = '<tr><td colspan="2" class="text-center text-gray-500">Select a staff member to view payments.</td></tr>';
                 return;
             }
 
+            const selectedStaff = staffDetails.find(s => s.docId === selectedStaffId);
+            if (!selectedStaff) {
+                showMessage('Selected staff member not found for report.');
+                return;
+            }
+
             let totalBillForReport = 0;
-            billDetails.filter(bill => bill.staffName === selectedStaff).forEach(bill => {
+            billDetails.filter(bill => bill.staffId === selectedStaffId).forEach(bill => { // Filter by staffId
                 totalBillForReport += bill.billAmount;
             });
 
             let totalPaidForReport = 0;
-            paymentHistory.filter(payment => payment.staffName === selectedStaff).forEach(payment => {
+            paymentHistory.filter(payment => payment.staffId === selectedStaffId).forEach(payment => { // Filter by staffId
                 totalPaidForReport += payment.amountPaid;
             });
 
             const pendingAmountForReport = totalBillForReport - totalPaidForReport;
 
-            // Update the new total spans
             reportTotalBillValueSpan.textContent = `₹${totalBillForReport.toFixed(2)}`;
             reportTotalPaidValueSpan.textContent = `₹${totalPaidForReport.toFixed(2)}`;
             pendingAmountValueSpan.textContent = `₹${pendingAmountForReport.toFixed(2)}`;
 
-
-            const staffBills = billDetails.filter(bill => bill.staffName === selectedStaff);
+            const staffBills = billDetails.filter(bill => bill.staffId === selectedStaffId); // Filter by staffId
             if (staffBills.length > 0) {
                 staffBills.sort((a, b) => new Date(a.billDate) - new Date(b.billDate)).forEach(bill => {
                     const row = reportBillsTableBody.insertRow();
@@ -981,10 +1022,10 @@
                     row.insertCell().textContent = bill.billAmount.toFixed(2);
                 });
             } else {
-                reportBillsTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">No bills found for ${selectedStaff}.</td></tr>`;
+                reportBillsTableBody.innerHTML = `<tr><td colspan="3" class="text-center text-gray-500">No bills found for ${selectedStaff.name}.</td></tr>`;
             }
 
-            const staffPayments = paymentHistory.filter(payment => payment.staffName === selectedStaff);
+            const staffPayments = paymentHistory.filter(payment => payment.staffId === selectedStaffId); // Filter by staffId
             if (staffPayments.length > 0) {
                 staffPayments.sort((a, b) => new Date(a.paymentDate) - new Date(b.paymentDate)).forEach(payment => {
                     const row = reportPaymentsTableBody.insertRow();
@@ -992,12 +1033,13 @@
                     row.insertCell().textContent = payment.amountPaid.toFixed(2);
                 });
             } else {
-                reportPaymentsTableBody.innerHTML = `<tr><td colspan="2" class="text-center text-gray-500">No payments found for ${selectedStaff}.</td></tr>`;
+                reportPaymentsTableBody.innerHTML = `<tr><td colspan="2" class="text-center text-gray-500">No payments found for ${selectedStaff.name}.</td></tr>`;
             }
 
-            const staffMobile = staffDetails[selectedStaff] ? staffDetails[selectedStaff].mobile : '';
+            const staffMobile = selectedStaff.mobile; // Get mobile from staffDetails using staffId
             if (staffMobile) {
-                const reportMessageEnglish = `Total Bill Amount: ₹${totalBillForReport.toFixed(2)}\n` +
+                const reportMessageEnglish = `Saaral Staff Report for ${selectedStaff.name}:\n` + // Removed mobile from here
+                                           `Total Bill Amount: ₹${totalBillForReport.toFixed(2)}\n` +
                                            `Total Paid Amount: ₹${totalPaidForReport.toFixed(2)}\n` +
                                            `Pending Balance: ₹${pendingAmountForReport.toFixed(2)}\n\n` +
                                            `For full details, please contact me.`;
@@ -1007,7 +1049,7 @@
                 smsButton.removeAttribute('disabled');
                 whatsappButton.removeAttribute('disabled');
             } else {
-                showMessage(`Mobile number not available for ${selectedStaff}. Cannot send report via SMS/WhatsApp.`);
+                showMessage(`Mobile number not available for ${selectedStaff.name}. Cannot send report via SMS/WhatsApp.`);
             }
         }
 
@@ -1133,7 +1175,7 @@
                 onAuthStateChanged(auth, (user) => {
                     clearTimeout(loadingTimeout); // Clear timeout once auth state is known
                     if (user) {
-                        window.userId = user.uid; // Correctly set userId from authenticated user and make it global
+                        window.userId = "my-saaral-tracker-admin"; // HARDCODED USER ID for sync
                         console.log("Authenticated with userId:", window.userId);
                         // Once authenticated, start listening to Firestore collections
                         setupFirestoreListeners(); // This triggers data loading and rendering
@@ -1174,9 +1216,9 @@
             // Listener for Staff Members
             onSnapshot(collection(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`), (snapshot) => { // Use window.appId, window.userId
                 console.log("Staff members snapshot received.");
-                staffDetails = {}; // Clear existing staff details
+                staffDetails = []; // Clear existing staff details
                 snapshot.forEach((doc) => {
-                    staffDetails[doc.id] = { ...doc.data(), docId: doc.id }; // doc.id is the staff name
+                    staffDetails.push({ ...doc.data(), docId: doc.id }); // Store doc.id for unique identification
                 });
                 console.log("Staff details updated:", staffDetails);
                 renderTables(); // Re-render all tables
