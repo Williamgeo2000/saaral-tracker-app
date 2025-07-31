@@ -313,7 +313,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                flex-direction: column;
+                flex-direction: column; /* Changed to column for logo on top */
                 margin-bottom: 20px;
                 padding-top: 20px;
             }
@@ -327,8 +327,8 @@
                 color: #333;
                 margin: 0;
             }
-            .tab-content, .tab-navigation, .input-group, .action-button, .message-box, .confirmation-dialog, #userIdDisplay {
-                display: none !important; /* Hide all UI elements not part of the report */
+            .tab-content, .tab-navigation, .input-group, .action-button, .message-box, .confirmation-dialog, #userIdDisplay, .send-button:not(#printReportBtn) {
+                display: none !important; /* Hide all UI elements not part of the report, EXCEPT print button */
             }
             #reportTab {
                 display: block !important; /* Only show the report tab */
@@ -380,6 +380,17 @@
                 display: block !important; /* Show print button */
                 text-align: center;
                 margin-top: 30px;
+            }
+            .print-back-button {
+                display: block; /* Make back button visible in print media */
+                margin: 20px auto; /* Center it */
+                padding: 10px 20px;
+                background-color: #007bff;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
             }
         }
     </style>
@@ -935,7 +946,40 @@
                 row.insertCell().textContent = bill.billDate;
                 row.insertCell().textContent = bill.billNo;
                 row.insertCell().textContent = bill.billAmount.toFixed(2);
+                const actionsCell = row.insertCell();
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('delete-button');
+                deleteButton.onclick = () => deleteBill(bill.docId); // Pass bill docId for deletion
+                actionsCell.appendChild(deleteButton);
             });
+        }
+
+        // New function to delete a bill
+        async function deleteBill(billIdToDelete) {
+            showConfirmation(
+                'Confirm Deletion',
+                `Are you sure you want to delete this bill? This action cannot be undone.`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        if (!window.userId) {
+                            showMessage('Authentication not ready. Please wait.');
+                            return;
+                        }
+                        try {
+                            const billDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/bills`, billIdToDelete);
+                            await deleteDoc(billDocRef);
+                            showMessage('Bill deleted successfully from Firestore.');
+                            // Data will be updated via onSnapshot listener
+                        } catch (e) {
+                            console.error("Error deleting bill: ", e);
+                            showMessage("Error deleting bill. Please try again.");
+                        }
+                    } else {
+                        showMessage('Bill deletion cancelled.');
+                    }
+                }
+            );
         }
 
         function renderPaymentHistoryTable() {
@@ -946,7 +990,40 @@
                 row.insertCell().textContent = payment.staffName; // Display staffName
                 row.insertCell().textContent = payment.paymentDate;
                 row.insertCell().textContent = payment.amountPaid.toFixed(2);
+                const actionsCell = row.insertCell();
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.classList.add('delete-button');
+                deleteButton.onclick = () => deletePayment(payment.docId); // Pass payment docId for deletion
+                actionsCell.appendChild(deleteButton);
             });
+        }
+
+        // New function to delete a payment
+        async function deletePayment(paymentIdToDelete) {
+            showConfirmation(
+                'Confirm Deletion',
+                `Are you sure you want to delete this payment? This action cannot be undone.`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        if (!window.userId) {
+                            showMessage('Authentication not ready. Please wait.');
+                            return;
+                        }
+                        try {
+                            const paymentDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/payments`, paymentIdToDelete);
+                            await deleteDoc(paymentDocRef);
+                            showMessage('Payment deleted successfully from Firestore.');
+                            // Data will be updated via onSnapshot listener
+                        } catch (e) {
+                            console.error("Error deleting payment: ", e);
+                            showMessage("Error deleting payment. Please try again.");
+                        }
+                    } else {
+                        showMessage('Payment deletion cancelled.');
+                    }
+                }
+            );
         }
 
         function renderSummaryTable() {
@@ -1538,6 +1615,17 @@
                         .report-summary-item p { margin: 0; font-weight: bold; }
                         .report-summary-item span { font-size: 1.1em; font-weight: bold; }
                         .page-break { page-break-before: always; }
+                        .print-back-button { /* Style for the back button in print view */
+                            display: block;
+                            margin: 20px auto;
+                            padding: 10px 20px;
+                            background-color: #007bff;
+                            color: white;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 16px;
+                        }
                     </style>
                 </head>
                 <body>
@@ -1554,6 +1642,7 @@
                     </div>
                     ${billsTableHtml}
                     ${paymentsTableHtml}
+                    <button class="print-back-button" onclick="window.close()">Back to App</button>
                 </body>
                 </html>
             `);
