@@ -219,7 +219,6 @@
             border: 1px solid #90cdf4;
             border-radius: 8px;
             padding: 15px 20px;
-            margin-bottom: 25px;
             text-align: center;
             display: flex; /* Use flexbox for horizontal layout */
             justify-content: space-around; /* Distribute items with space around them */
@@ -381,9 +380,9 @@
                 text-align: center;
                 margin-top: 30px;
             }
-            .print-back-button {
-                display: block; /* Make back button visible in print media */
-                margin: 20px auto; /* Center it */
+            .print-back-button { /* Style for the back button in print view */
+                display: block;
+                margin: 20px auto;
                 padding: 10px 20px;
                 background-color: #007bff;
                 color: white;
@@ -485,6 +484,7 @@
                             <th>Bill Date</th>
                             <th>Bill No.</th>
                             <th class="rounded-tr-lg">Bill Amount (₹)</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -496,7 +496,7 @@
 
         <!-- Payment History Tab Content -->
         <div id="paymentHistoryTab" class="tab-content hidden">
-            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Payment</h2>
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Add New Payment</button>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div class="input-group">
                     <label for="paymentStaffNameSelect">Staff Name</label>
@@ -524,6 +524,7 @@
                             <th class="rounded-tl-lg">Staff Name</th>
                             <th>Payment Date</th>
                             <th class="rounded-tr-lg">Amount Paid (₹)</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -535,7 +536,7 @@
 
         <!-- Summary Tab Content (Per-Staff Summary) -->
         <div id="summaryTab" class="tab-content hidden">
-            <h2 class="2xl font-semibold text-gray-700 mb-4">Per-Staff Summary</h2>
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Per-Staff Summary</h2>
             <div class="table-container">
                 <table id="summaryTable" class="min-w-full bg-white rounded-lg shadow-sm">
                     <thead>
@@ -615,7 +616,7 @@
                 </div>
 
                 <div class="flex justify-center gap-4 mt-6">
-                    <button id="printReportBtn" class="send-button">
+                    <button id="printReportBtn" class="send-button" onclick="window.printReport()">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
                             <path fill-rule="evenodd" d="M7.875 1.5C6.839 1.5 6 2.34 6 3.375v2.25A3.375 3.375 0 0 0 9.375 9H13.5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 0 8.25 16.5v-2.25a.75.75 0 0 0-.75-.75H3.375A3.375 3.375 0 0 0 0 16.875V20.25a3.375 3.375 0 0 0 3.375 3.375h17.25c1.035 0 1.875-.84 1.875-1.875V4.75a3.75 3.75 0 0 0-3.75-3.75H7.875ZM15.75 9V5.25a.75.75 0 0 0-.75-.75H9.375A1.875 1.875 0 0 0 7.5 5.25v2.25a.75.75 0 0 0 .75.75h4.5a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-.75.75H9.75A.75.75 0 0 0 9 15.75v-2.25a.75.75 0 0 0-.75-.75H4.5a.75.75 0 0 0-.75.75v2.25c0 .088.013.176.039.26L2.513 18.06A1.875 1.875 0 0 1 3.375 16.5H6v2.25a.75.75 0 0 0 .75.75h1.5a.75.75 0 0 0 .75-.75v-2.25h1.5v2.25a.75.75 0 0 0 .75.75h1.5a.75.75 0 0 0 .75-.75v-2.25h1.5v2.25a.75.75 0 0 0 .75.75h1.5a.75.75 0 0 0 .75-.75v-2.25h1.5a1.875 1.875 0 0 1 1.875 1.875v1.94l-.458-.115a1.875 1.875 0 0 1-1.427-.577l-1.427-1.427a.75.75 0 0 0-1.06 0l-.97.97a.75.75 0 0 1-1.06 0l-.97-.97a.75.75 0 0 0-1.06 0l-.97.97a.75.75 0 0 1-1.06 0l-.97-.97a.75.75 0 0 0-1.06 0l-1.427 1.427a1.875 1.875 0 0 1-1.427.577Z" clip-rule="evenodd" />
                         </svg>
@@ -683,34 +684,30 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, query, where, writeBatch, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Configuration (moved outside function for clarity and global access)
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyA3EbcGQBEnThwvTTKxHWVfwLdVWIj4_pc",
-            authDomain: "saaraltrackerapp.firebaseapp.com",
-            projectId: "saaraltrackerapp",
-            storageBucket: "saaraltrackerapp.firebasestorage.app",
-            messagingSenderId: "606630552381",
-            appId: "1:606630552381:web:9d9caebd60a0c903825b54"
+            apiKey: "AIzaSyCRRc7Ez0Q0roavCA8sKWWsaEdUqr5jF6c",
+            authDomain: "saaralbilltrack-eb4eb.firebaseapp.com",
+            projectId: "saaralbilltrack-eb4eb",
+            storageBucket: "saaralbilltrack-eb4eb.firebasestorage.app",
+            messagingSenderId: "221707853612",
+            appId: "1:221707853612:web:21a69cfe1c0ec2ce1e1689"
         };
 
-        // Firebase variables - Declared globally (no 'let' here)
+        // Firebase variables
         let app;
         let db;
         let auth;
         // userId and appId are now global via window object
-        window.userId = "my-saaral-tracker-admin"; // HARDCODED USER ID
-        window.appId = firebaseConfig.projectId; // Use projectId from the config as appId
+        window.userId = "my-saaral-tracker-admin"; 
+        window.appId = firebaseConfig.projectId; 
 
-        // Data storage in memory (will be synced with Firestore)
-        // Changed staffDetails to an array to support multiple staff with same name
-        let staffDetails = []; // Now an array of { id, name, mobile }
+        let staffDetails = []; 
         let billDetails = [];
         let paymentHistory = [];
 
-        // Variable to store the callback for confirmation dialog
         let confirmationCallback = null;
 
-        // Function to show messages to the user
         function showMessage(message, duration = 3000) {
             const messageBox = document.getElementById('messageBox');
             messageBox.textContent = message;
@@ -720,29 +717,24 @@
             }, duration);
         }
 
-        // Function to show a custom confirmation dialog
         function showConfirmation(title, message, callback) {
             const dialog = document.getElementById('confirmationDialog');
             document.getElementById('confirmationTitle').textContent = title;
             document.getElementById('confirmationMessage').textContent = message;
-            confirmationCallback = callback; // Store the callback function
+            confirmationCallback = callback;
             dialog.classList.add('show');
         }
 
-        // Function to handle confirmation dialog response
-        window.handleConfirmation = function(confirmed) { // Made global
+        window.handleConfirmation = function(confirmed) {
             const dialog = document.getElementById('confirmationDialog');
             dialog.classList.remove('show');
             if (confirmationCallback) {
                 confirmationCallback(confirmed);
-                confirmationCallback = null; // Clear the callback
+                confirmationCallback = null;
             }
         }
 
-        // --- Firestore Operations ---
-
-        // Function to add a new staff member to Firestore
-        window.addStaffMember = async function() { // Made global
+        window.addStaffMember = async function() {
             const newStaffNameInput = document.getElementById('newStaffName');
             const newStaffMobileInput = document.getElementById('newStaffMobile');
             const staffName = newStaffNameInput.value.trim();
@@ -756,12 +748,11 @@
                 showMessage('Please enter a mobile number.');
                 return;
             }
-            if (!window.userId) { // Use window.userId
+            if (!window.userId) {
                 showMessage('Authentication not ready. Please wait.');
                 return;
             }
 
-            // Check if staff with this mobile number already exists
             const existingStaff = staffDetails.find(s => s.mobile === mobileNumber);
             if (existingStaff) {
                 showMessage(`Staff member with mobile number "${mobileNumber}" already exists.`);
@@ -771,25 +762,22 @@
             }
 
             try {
-                // Use addDoc to let Firestore generate a unique ID for the staff member
                 const staffCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`);
                 await addDoc(staffCollectionRef, {
                     name: staffName,
                     mobile: mobileNumber,
-                    timestamp: new Date() // Add timestamp for sorting
+                    timestamp: new Date()
                 });
                 newStaffNameInput.value = '';
                 newStaffMobileInput.value = '';
                 showMessage(`Staff "${staffName}" added to Firestore.`);
-                // Data will be updated via onSnapshot listener
             } catch (e) {
                 console.error("Error adding staff member: ", e);
                 showMessage("Error adding staff member. Please try again.");
             }
         }
 
-        // Function to delete a staff member from Firestore and related data
-        window.deleteStaffMember = async function(staffIdToDelete) { // Now accepts staffId
+        window.deleteStaffMember = async function(staffIdToDelete) {
             const staffMember = staffDetails.find(s => s.docId === staffIdToDelete);
             if (!staffMember) {
                 showMessage('Staff member not found.');
@@ -807,21 +795,15 @@
                         }
                         try {
                             const batch = writeBatch(db);
-
-                            // 1. Delete staff member document
                             const staffDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/staff_members`, staffIdToDelete);
                             batch.delete(staffDocRef);
 
-                            // 2. Delete associated bills
-                            // Query by staffId, not staffName, for accuracy
                             const billsQuery = query(collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`), where("staffId", "==", staffIdToDelete));
                             const billDocs = await getDocs(billsQuery);
                             billDocs.forEach((doc) => {
                                 batch.delete(doc.ref);
                             });
 
-                            // 3. Delete associated payments
-                            // Query by staffId, not staffName, for accuracy
                             const paymentsQuery = query(collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`), where("staffId", "==", staffIdToDelete));
                             const paymentDocs = await getDocs(paymentsQuery);
                             paymentDocs.forEach((doc) => {
@@ -830,22 +812,70 @@
 
                             await batch.commit();
                             showMessage(`Staff member "${staffMember.name}" and all their data deleted successfully from Firestore.`);
-                            // Data will be updated via onSnapshot listeners
                         } catch (e) {
                             console.error("Error deleting staff member and data: ", e);
                             showMessage("Error deleting staff member and data. Please try again.");
                         }
                     } else {
-                        showMessage(`Deletion of "${staffMember.name}" cancelled.`);
+                        showMessage('Deletion cancelled.');
+                    }
+                }
+            );
+        }
+        
+        window.deleteBill = async function(billIdToDelete) {
+            showConfirmation(
+                'Confirm Deletion',
+                `Are you sure you want to delete this bill? This action cannot be undone.`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        if (!window.userId) {
+                            showMessage('Authentication not ready. Please wait.');
+                            return;
+                        }
+                        try {
+                            const billDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/bills`, billIdToDelete);
+                            await deleteDoc(billDocRef);
+                            showMessage('Bill deleted successfully from Firestore.');
+                        } catch (e) {
+                            console.error("Error deleting bill: ", e);
+                            showMessage("Error deleting bill. Please try again.");
+                        }
+                    } else {
+                        showMessage('Bill deletion cancelled.');
                     }
                 }
             );
         }
 
-        // Function to add a new bill to Firestore
-        window.addBill = async function() { // Made global
+        window.deletePayment = async function(paymentIdToDelete) {
+            showConfirmation(
+                'Confirm Deletion',
+                `Are you sure you want to delete this payment? This action cannot be undone.`,
+                async (confirmed) => {
+                    if (confirmed) {
+                        if (!window.userId) {
+                            showMessage('Authentication not ready. Please wait.');
+                            return;
+                        }
+                        try {
+                            const paymentDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/payments`, paymentIdToDelete);
+                            await deleteDoc(paymentDocRef);
+                            showMessage('Payment deleted successfully from Firestore.');
+                        } catch (e) {
+                            console.error("Error deleting payment: ", e);
+                            showMessage("Error deleting payment. Please try again.");
+                        }
+                    } else {
+                        showMessage('Deletion cancelled.');
+                    }
+                }
+            );
+        }
+
+        window.addBill = async function() {
             const billStaffSelect = document.getElementById('billStaffNameSelect');
-            const selectedStaffId = billStaffSelect.value; // Get the staffId from the dropdown
+            const selectedStaffId = billStaffSelect.value;
             const billDate = document.getElementById('billDate').value;
             const billNo = document.getElementById('billNo').value.trim();
             const billAmount = parseFloat(document.getElementById('billAmount').value);
@@ -859,7 +889,6 @@
                 return;
             }
 
-            // Find the full staff details using the selectedStaffId
             const staff = staffDetails.find(s => s.docId === selectedStaffId);
             if (!staff) {
                 showMessage('Selected staff member not found. Please re-select.');
@@ -868,10 +897,10 @@
 
             try {
                 const billsCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/bills`);
-                await addDoc(billsCollectionRef, { // Use addDoc for auto-ID
-                    staffId: staff.docId, // Store unique staff ID
-                    staffName: staff.name, // Store name for display/redundancy
-                    staffMobile: staff.mobile, // Store mobile for display/redundancy
+                await addDoc(billsCollectionRef, {
+                    staffId: staff.docId,
+                    staffName: staff.name,
+                    staffMobile: staff.mobile,
                     billDate: billDate,
                     billNo: billNo,
                     billAmount: billAmount,
@@ -890,10 +919,9 @@
             }
         }
 
-        // Function to add a new payment to Firestore
-        window.addPayment = async function() { // Made global
+        window.addPayment = async function() {
             const paymentStaffSelect = document.getElementById('paymentStaffNameSelect');
-            const selectedStaffId = paymentStaffSelect.value; // Get staffId from dropdown
+            const selectedStaffId = paymentStaffSelect.value;
             const paymentDate = document.getElementById('paymentDate').value;
             const amountPaid = parseFloat(document.getElementById('amountPaid').value);
 
@@ -906,7 +934,6 @@
                 return;
             }
 
-            // Find the full staff details using the selectedStaffId
             const staff = staffDetails.find(s => s.docId === selectedStaffId);
             if (!staff) {
                 showMessage('Selected staff member not found. Please re-select.');
@@ -915,10 +942,10 @@
 
             try {
                 const paymentsCollectionRef = collection(db, `artifacts/${window.appId}/users/${window.userId}/payments`);
-                await addDoc(paymentsCollectionRef, { // Use addDoc for auto-ID
-                    staffId: staff.docId, // Store unique staff ID
-                    staffName: staff.name, // Store name for display/redundancy
-                    staffMobile: staff.mobile, // Store mobile for display/redundancy
+                await addDoc(paymentsCollectionRef, {
+                    staffId: staff.docId,
+                    staffName: staff.name,
+                    staffMobile: staff.mobile,
                     paymentDate: paymentDate,
                     amountPaid: amountPaid,
                     timestamp: new Date()
@@ -935,14 +962,12 @@
             }
         }
 
-        // --- UI Rendering Functions (mostly unchanged, now driven by Firestore data) ---
-
         function renderBillDetailsTable() {
             const tableBody = document.getElementById('billDetailsTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
             billDetails.forEach(bill => {
                 const row = tableBody.insertRow();
-                row.insertCell().textContent = bill.staffName; // Display staffName
+                row.insertCell().textContent = bill.staffName;
                 row.insertCell().textContent = bill.billDate;
                 row.insertCell().textContent = bill.billNo;
                 row.insertCell().textContent = bill.billAmount.toFixed(2);
@@ -950,13 +975,12 @@
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
                 deleteButton.classList.add('delete-button');
-                deleteButton.onclick = () => deleteBill(bill.docId); // Pass bill docId for deletion
+                deleteButton.onclick = () => window.deleteBill(bill.docId);
                 actionsCell.appendChild(deleteButton);
             });
         }
-
-        // New function to delete a bill
-        async function deleteBill(billIdToDelete) {
+        
+        window.deleteBill = async function(billIdToDelete) {
             showConfirmation(
                 'Confirm Deletion',
                 `Are you sure you want to delete this bill? This action cannot be undone.`,
@@ -970,7 +994,6 @@
                             const billDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/bills`, billIdToDelete);
                             await deleteDoc(billDocRef);
                             showMessage('Bill deleted successfully from Firestore.');
-                            // Data will be updated via onSnapshot listener
                         } catch (e) {
                             console.error("Error deleting bill: ", e);
                             showMessage("Error deleting bill. Please try again.");
@@ -987,20 +1010,19 @@
             tableBody.innerHTML = '';
             paymentHistory.forEach(payment => {
                 const row = tableBody.insertRow();
-                row.insertCell().textContent = payment.staffName; // Display staffName
+                row.insertCell().textContent = payment.staffName;
                 row.insertCell().textContent = payment.paymentDate;
                 row.insertCell().textContent = payment.amountPaid.toFixed(2);
                 const actionsCell = row.insertCell();
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
                 deleteButton.classList.add('delete-button');
-                deleteButton.onclick = () => deletePayment(payment.docId); // Pass payment docId for deletion
+                deleteButton.onclick = () => window.deletePayment(payment.docId);
                 actionsCell.appendChild(deleteButton);
             });
         }
 
-        // New function to delete a payment
-        async function deletePayment(paymentIdToDelete) {
+        window.deletePayment = async function(paymentIdToDelete) {
             showConfirmation(
                 'Confirm Deletion',
                 `Are you sure you want to delete this payment? This action cannot be undone.`,
@@ -1014,7 +1036,6 @@
                             const paymentDocRef = doc(db, `artifacts/${window.appId}/users/${window.userId}/payments`, paymentIdToDelete);
                             await deleteDoc(paymentDocRef);
                             showMessage('Payment deleted successfully from Firestore.');
-                            // Data will be updated via onSnapshot listener
                         } catch (e) {
                             console.error("Error deleting payment: ", e);
                             showMessage("Error deleting payment. Please try again.");
@@ -1030,9 +1051,8 @@
             const tableBody = document.getElementById('summaryTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
 
-            const staffSummary = {}; // Object to hold summary data for each staff, keyed by staffId
+            const staffSummary = {};
 
-            // Initialize summary for all known staff
             staffDetails.forEach(staff => {
                 staffSummary[staff.docId] = {
                     name: staff.name,
@@ -1044,24 +1064,23 @@
             });
 
             billDetails.forEach(bill => {
-                if (staffSummary[bill.staffId]) { // Ensure staff exists in summary
+                if (staffSummary[bill.staffId]) {
                     staffSummary[bill.staffId].totalBill += bill.billAmount;
                 }
             });
 
             paymentHistory.forEach(payment => {
-                if (staffSummary[payment.staffId]) { // Ensure staff exists in summary
+                if (staffSummary[payment.staffId]) {
                     staffSummary[payment.staffId].totalPaid += payment.amountPaid;
                 }
             });
 
-            // Iterate over sorted staffDetails to ensure all staff are displayed
             Array.from(staffDetails).sort((a, b) => a.name.localeCompare(b.name)).forEach(staff => {
                 const summary = staffSummary[staff.docId];
                 summary.totalPending = summary.totalBill - summary.totalPaid;
 
                 const row = tableBody.insertRow();
-                row.insertCell().textContent = `${summary.name}`; // Display ONLY name, removed mobile
+                row.insertCell().textContent = `${summary.name}`; 
                 row.insertCell().textContent = summary.totalBill.toFixed(2);
                 row.insertCell().textContent = summary.totalPaid.toFixed(2);
                 row.insertCell().textContent = summary.totalPending.toFixed(2);
@@ -1072,16 +1091,15 @@
             const tableBody = document.getElementById('staffListTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
 
-            // Sort staff by name for display
             Array.from(staffDetails).sort((a, b) => a.name.localeCompare(b.name)).forEach(staff => {
                 const row = tableBody.insertRow();
                 row.insertCell().textContent = staff.name;
-                row.insertCell().textContent = staff.mobile || 'N/A'; // Display mobile number
+                row.insertCell().textContent = staff.mobile || 'N/A';
                 const actionsCell = row.insertCell();
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
                 deleteButton.classList.add('delete-button');
-                deleteButton.onclick = () => deleteStaffMember(staff.docId); // Pass docId for deletion
+                deleteButton.onclick = () => window.deleteStaffMember(staff.docId);
                 actionsCell.appendChild(deleteButton);
             });
         }
@@ -1091,12 +1109,10 @@
             const paymentStaffSelect = document.getElementById('paymentStaffNameSelect');
             const reportStaffSelect = document.getElementById('reportStaffNameSelect');
 
-            // Store current selected values (docId) to restore after repopulating
             const currentBillSelected = billStaffSelect.value;
             const currentPaymentSelected = paymentStaffSelect.value;
             const currentReportSelected = reportStaffSelect.value;
 
-            // Clear existing options (except the default "Select Staff")
             billStaffSelect.innerHTML = '<option value="">Select Staff</option>';
             paymentStaffSelect.innerHTML = '<option value="">Select Staff</option>';
             reportStaffSelect.innerHTML = '<option value="">Select Staff</option>';
@@ -1104,26 +1120,22 @@
             const sortedStaff = Array.from(staffDetails).sort((a, b) => a.name.localeCompare(b.name));
 
             sortedStaff.forEach(staff => {
-                // Display only name in dropdowns for Bill Details, Payment History, and Report section
-                const optionText = staff.name; 
-                
                 const option1 = document.createElement('option');
-                option1.value = staff.docId; // Use docId as the value
-                option1.textContent = optionText; // Only name
+                option1.value = staff.docId; 
+                option1.textContent = staff.name; 
                 billStaffSelect.appendChild(option1);
 
                 const option2 = document.createElement('option');
-                option2.value = staff.docId; // Use docId as the value
-                option2.textContent = optionText; // Only name
+                option2.value = staff.docId; 
+                option2.textContent = staff.name; 
                 paymentStaffSelect.appendChild(option2);
 
                 const option3 = document.createElement('option');
-                option3.value = staff.docId; // Use docId as the value
-                option3.textContent = optionText; // Only name
+                option3.value = staff.docId;
+                option3.textContent = staff.name;
                 reportStaffSelect.appendChild(option3);
             });
 
-            // Restore previously selected values if they still exist
             if (staffDetails.some(s => s.docId === currentBillSelected)) {
                 billStaffSelect.value = currentBillSelected;
             }
@@ -1135,8 +1147,8 @@
             }
         }
 
-        window.generateReport = function() { // Made global
-            const selectedStaffId = document.getElementById('reportStaffNameSelect').value; // Get staffId
+        window.generateReport = function() {
+            const selectedStaffId = document.getElementById('reportStaffNameSelect').value;
             const reportBillsTableBody = document.getElementById('reportBillsTable').getElementsByTagName('tbody')[0];
             const reportPaymentsTableBody = document.getElementById('reportPaymentsTable').getElementsByTagName('tbody')[0];
             const reportTotalBillValueSpan = document.getElementById('reportTotalBillValue');
@@ -1304,12 +1316,12 @@
             try {
                 // Firebase Configuration: Directly use the provided config
                 const firebaseConfig = {
-                    apiKey: "AIzaSyA3EbcGQBEnThwvTTKxHWVfwLdVWIj4_pc",
-                    authDomain: "saaraltrackerapp.firebaseapp.com",
-                    projectId: "saaraltrackerapp",
-                    storageBucket: "saaraltrackerapp.firebasestorage.app",
-                    messagingSenderId: "606630552381",
-                    appId: "1:606630552381:web:9d9caebd60a0c903825b54"
+                    apiKey: "AIzaSyCRRc7Ez0Q0roavCA8sKWWsaEdUqr5jF6c",
+                    authDomain: "saaralbilltrack-eb4eb.firebaseapp.com",
+                    projectId: "saaralbilltrack-eb4eb",
+                    storageBucket: "saaralbilltrack-eb4eb.firebasestorage.app",
+                    messagingSenderId: "221707853612",
+                    appId: "1:221707853612:web:21a69cfe1c0ec2ce1e1689"
                 };
                 console.log("Firebase Config:", firebaseConfig);
 
@@ -1630,7 +1642,7 @@
                 </head>
                 <body>
                     <div class="header-print">
-                        <img src="Logo 1.png" alt="Saaral Textiles Logo" onerror="this.onerror=null;this.src='https://placehold.co/100x100/CCCCCC/333333?text=Logo';">
+                        <img src="https://storage.googleapis.com/saaralbilltrack-eb4eb.appspot.com/Logo 1.png" alt="Saaral Textiles Logo" onerror="this.onerror=null;this.src='https://placehold.co/100x100/CCCCCC/333333?text=Logo';">
                         <h1>Saaral Textiles</h1>
                         <h2 style="margin-top: 10px;">Staff Payment Report for ${selectedStaff.name}</h2>
                         <p>Mobile Number: ${selectedStaff.mobile || 'N/A'}</p>
